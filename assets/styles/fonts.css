@@ -1,0 +1,77 @@
+@font-face {
+    font-family: "Roobert";
+    font-style: normal;
+    font-weight: 500;
+    src: url('../fonts/Roobert-Medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: "Roobert";
+    font-style: normal;
+    font-weight: 600;
+    src: url('../fonts/Roobert-SemiBold.woff2') format('woff2');
+
+
+}
+
+
+@font-face {
+    font-family: "Roobert";
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/RoobertBold.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Nature Beauty';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/NatureBeauty.ttf') format('truetype');
+}
+
+
+@font-face {
+    font-family: 'DIN Round';
+    src: url('../fonts/DIN_Round.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+
+}
+
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    font-family: var(--font--family);
+    font-style: var(--font--style);
+    font-weight: var(--font--weight);
+    font-feature-settings: var(--font--feature-settings);
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+figure {
+    margin: 0;
+    margin-left: 0px;
+}
+
+body {
+
+    margin: 0;
+
+}
+
+main {
+    display: block;
+}
+
+
+a {
+    text-decoration: none;
+    color: inherit;
+}

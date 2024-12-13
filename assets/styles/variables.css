@@ -1,0 +1,43 @@
+:root {
+    --color--foreground--100: rgb(0 0 0 / 1);
+    --color--foreground--50: rgb(0 0 0 / 0.5);
+    --color--foreground--33: rgb(0 0 0 / 0.333);
+    --color--foreground--25: rgb(0 0 0 / 0.25);
+    --color--foreground--20: rgb(0 0 0 / 0.2);
+    --color--foreground--15: rgb(0 0 0 / 0.15);
+    --color--foreground--10: rgb(0 0 0 / 0.1);
+    --color--foreground--5: rgb(0 0 0 / 0.05);
+    --color--foreground--0: rgb(0 0 0 / 0);
+    --color--background--100: rgb(255 255 255 / 1);
+    --color--background--0: rgb(255 255 255 / 0);
+    --nav-item-unselected: rgb(170, 170, 170);
+    --nav-item-selected: rgb(0, 0, 0);
+    --nav-item-hover: rgb(0, 0, 0);
+}
+
+/* Grid */
+:root {
+    --grid--app-margin: 40px;
+    --grid--app-columns: var(--grid--app-columns-12);
+    --grid--app-columns-12: repeat(12, [col-start] 1fr);
+    --grid--app-columns-6: repeat(6, [col-start] 1fr);
+    --grid--app-columns-4: repeat(4, [col-start] 1fr);
+    --grid--app-columns-3: repeat(3, [col-start] 1fr);
+    --grid--app-columns-2: repeat(2, [col-start] 1fr);
+    --grid--app-columns-1: repeat(1, [col-start] 1fr);
+    --grid--app-gutter: 20px;
+    --grid--app-xheight: 220px;
+}
+
+/* Typography */
+:root {
+    --font--family: "Roobert", system-ui, sans-serif;
+    --font--style: normal;
+    --font--weight: 500;
+    --font--margin-left: -0.07em;
+    --font--margin-left-opening-quote-mark: -0.406em;
+    --font--feature-settings: "liga", "ss02", "ss03", "ss04", "ss06";
+    --font--feature-settings-no-stylized-numeral-8: "ss06" 0;
+    --font--size-huge: clamp(36px, 5.14vw, 5.14vw);
+    --font--size-large: clamp(26px, 1.81vw, 1.81vw);
+}

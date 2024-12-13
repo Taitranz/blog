@@ -1,0 +1,97 @@
+.blog-header {
+    position: fixed;
+    width: 100%;
+    padding: 0 var(--grid--app-margin);
+    z-index: 100;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.blog-header>.content {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.blog-header .name {
+    padding: 12px 0;
+    font-family: "Roobert";
+    font-weight: 500;
+    font-size: 12px;
+
+}
+
+
+.blog-main {
+    font-family: "Roobert", system-ui, sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-feature-settings: "liga", "ss02", "ss03", "ss04", "ss06";
+    overflow-y: auto;
+
+}
+
+.section {
+    padding: 0 var(--grid--app-margin);
+    display: grid;
+    grid-template-columns: var(--grid--app-columns);
+    gap: var(--grid--app-gutter);
+}
+
+.section>.content {
+    grid-column: 5 / -1;
+    padding: 220px 0 20px 0;
+}
+
+.section h1 {
+    margin-left: var(--font--margin-left);
+
+    font-size: var(--font--size-huge);
+    line-height: 0.975;
+    letter-spacing: -0.02em;
+}
+
+.section h2 {
+    margin-left: var(--font--margin-left);
+    font-size: var(--font--size-large);
+    line-height: 1.16;
+    letter-spacing: -0.01em;
+}
+
+
+
+.section h1 {
+    margin-left: var(--font--margin-left);
+
+    font-size: var(--font--size-huge);
+    line-height: 0.975;
+    letter-spacing: -0.02em;
+}
+
+.section h2 {
+    margin-left: var(--font--margin-left);
+    font-size: var(--font--size-large);
+    line-height: 1.16;
+    letter-spacing: -0.01em;
+}
+
+
+.details {
+    display: flex;
+    align-items: center;
+}
+
+.date {
+    margin-right: 10px;
+    /* Adjust spacing as needed */
+}
+
+.tags {
+    display: flex;
+}
+
+.tag {
+    margin-right: 5px;
+    /* Adjust spacing as needed */
+}
