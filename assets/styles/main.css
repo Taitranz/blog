@@ -105,11 +105,6 @@ body {
     align-items: center;
 }
 
-.date::before {
-    content: "📅";
-    margin-right: 8px;
-}
-
 .tags {
     display: flex;
     gap: 10px;
