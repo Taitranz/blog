@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Valgo Project Updates — Tai Tran Blog</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Valgo is a GPU-accelerated financial charting and technical analysis application for professional forex traders.">
+    <meta name="keywords"
+        content="Valgo, GPU, financial, charting, forex, trading, technical analysis, python, software engineering">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://blog.taitranz.com/posts/valgo-project-updates.html">
+    <meta property="og:site_name" content="Tai Tran Blog">
+    <meta property="og:title" content="Valgo Project Updates — Tai Tran Blog">
+    <meta property="og:description"
+        content="Valgo is a GPU-accelerated financial charting and technical analysis application for professional forex traders.">
+
+    <link rel="icon" href="../assets/favicon_io/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="../assets/favicon_io/site.webmanifest">
+
+    <link rel="canonical" href="https://blog.taitranz.com/posts/valgo-project-updates.html">
+
+    <link rel="stylesheet" href="../assets/styles/fonts.css">
+    <link rel="stylesheet" href="../assets/styles/variables.css">
+    <link rel="stylesheet" href="../assets/styles/media-queries.css">
+    <link rel="stylesheet" href="../assets/styles/main.css">
+
+</head>
+
+<body>
+    <header class="blog-header">
+        <div class="content">
+            <h1>
+                <a href="../index.html" style="color: inherit; text-decoration: none;">Tai Tran</a>
+            </h1>
+        </div>
+    </header>
+    <main class="blog-main">
+        <section class="section blog">
+            <div class="content">
+                <div class="blog-container">
+                    <div class="title">
+                        Valgo Project Updates
+                    </div>
+                    <div class="details">
+                        <div class="date">
+                            29-10-2025
+                        </div>
+                        <div class="tags">
+                            <div class="tag">
+                                Real-time Data Processing
+                            </div>
+                            <div class="tag">
+                                Data Visualization
+                            </div>
+                            <div class="tag">
+                                GPU Computing
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overview">
+                        <h2>Strategic Vision: AI-Powered Autonomous Trading</h2>
+                        <p>Valgo is under active development as the foundational tooling infrastructure for an ambitious multi-stage AI trading system. The project's long-term goal is to build, train, and deploy machine learning models capable of autonomous forex trading through continuous feedback loops and iterative improvement.</p>
+                        
+                        <p>The tooling layer, represented by the current Valgo codebase, provides sophisticated market data visualization, technical pattern detection, real-time streaming, and comprehensive data persistence. It enables traders to manually identify and label high-quality trading opportunities that serve as the foundation for model training. The good trade model is trained on manually-labeled profitable trades, learning patterns that distinguish winning setups from random price action. This model scans live market data to identify candidate trades that match learned characteristics.</p>
+                        
+                        <p>An independently trained bad trade filter model recognizes common losing patterns, acting as a verification layer. When the good trade model identifies an opportunity, the bad trade model validates it isn't matching known failure patterns. Identified trades are executed in a paper trading environment, with results collected and used to generate high-quality training data. This labeled data continuously improves both models, reducing false positives and refining pattern recognition.</p>
+                        
+                        <p>As models improve through repeated training on expanding datasets, their accuracy increases, false trade identification decreases, and the system develops increasingly nuanced understanding of market microstructure. Once model confidence and accuracy reach production thresholds, the verified good trade model is deployed with autonomous execution capabilities, allowing the system to identify and execute trades without human intervention while continuously learning from real trading results. Valgo's architecture provides the essential infrastructure for this vision by ensuring reliable data capture, consistent pattern identification, and traceable trade lifecycle management.</p>
+                        
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        
+                        <h2>Executive Summary</h2>
+                        <p>Valgo is a GPU-accelerated financial charting application currently under development for forex analysis and technical market structure detection. Developed as in-house software, it uses modern architecture patterns including Domain-Driven Design, CQRS, and Event-Driven architecture to deliver real-time candlestick visualisation with Smart Money Concepts (SMC) pattern detection. The application focuses on performance through GPU acceleration, data streaming, and optimised rendering pipelines whilst maintaining clean architectural boundaries and state management.</p>
+                        
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+                        
+                        <h2>1. Architecture & Core Design</h2>
+                        <h3>1.1 Layered Architecture</h3>
+                        <p>Valgo implements a rigorous four-layer clean architecture that maintains strict separation of concerns. The core layer contains framework-agnostic business logic divided into pure business entities, services, repository interfaces, use cases, command/query handlers, and orchestrators. This layer represents the heart of the business domain without any dependencies on external frameworks or infrastructure.</p>
+                        
+                        <p>The adapters layer provides infrastructure implementations bridging external concerns including data feed providers, real-time price streaming, persistence, configuration management, and event bus implementation. This layer translates between the pure domain logic and external systems, allowing the core to remain isolated and testable. The GUI layer handles all presentation concerns with chart widgets, visuals, controllers, view models, and overlay systems. Finally, the shared layer manages cross-cutting concerns including dependency injection container, configuration schema, utilities and styling that are used across all other layers.</p>
+                        
+                        <h3>1.2 Design Patterns Implemented</h3>
+                        <p>The application employs several design patterns to maintain code quality and testability. The Command/Query Mediator Pattern routes all application commands to specialized handlers, providing centralized validation and logging with optional enhanced logging for debugging. This pattern ensures consistent handling of all user actions and system commands while maintaining a clear audit trail.</p>
+                        
+                        <p>The Repository Pattern uses abstract repository interfaces that enable implementation via persistence adapters, enabling loose coupling and testability. Domain logic interacts with repositories through well-defined interfaces without knowing the underlying persistence mechanism, whether it's a database, file system, or in-memory store. An Event-Driven Architecture uses a thread-safe event bus that implements publish/subscribe for domain events. Components communicate via typed events rather than direct coupling, allowing the system to evolve independently while maintaining loose coupling between modules.</p>
+                        
+                        <p>The Presenter Pattern decouples business logic from UI framework details, enabling testing without framework dependencies. This separation allows comprehensive testing of presentation logic without requiring a running UI framework. Dependency Injection manages singleton/transient lifetimes with registration modules organized by layer, providing centralized control over object creation and lifetime management while simplifying testing through easy mock injection.</p>
+                        
+                        <h2>2. Charting Engine & Rendering</h2>
+                        <h3>2.1 GPU-Accelerated Rendering</h3>
+                        <p>The charting engine leverages GPU-accelerated scientific visualisation with OpenGL support, enabling real-time candlestick rendering at high frame rates. Custom shaders handle complex visual effects, offloading rendering computations from the CPU to the GPU for maximum performance. This architecture allows the application to handle thousands of candlesticks with smooth panning and zooming interactions.</p>
+                        
+                        <p>The application supports multiple rendering modes including traditional candlesticks, hollow candles, volume candles, line charts, area/baseline charts, column/high-low charts, and advanced modes like volume footprints. Each rendering mode is optimised for specific analytical purposes, from quick visual scanning to detailed volume analysis. An overlay system provides performance monitoring, symbol information, last price lines, countdown labels, sweep detection visualisations, external structure overlays, time-now indicators, and date range boundaries. These overlays adapt dynamically to chart interactions, appearing and disappearing based on user actions and system state.</p>
+                        
+                        <h3>2.2 Camera & Viewport Management</h3>
+                        <p>The camera system manages viewport position, zoom level, and pan boundaries with support for arbitrary pan/zoom operations within configurable limits. Level-of-Detail rendering adjusts detail based on zoom level for performance, automatically reducing visual complexity when viewing large time ranges and increasing detail when zooming in. Camera state persistence ensures users return to their exact viewing position across sessions.</p>
+                        
+                        <p>Interaction controllers handle mouse interaction for panning and viewport queries, mouse wheel zooming with configurable speeds, keyboard shortcuts for zoom and navigation, cursor overlays with price/time coordinates, and frame tick updates running at 60 FPS by default. These controllers work together to provide fluid, responsive interactions that feel natural and immediate despite the computational complexity of rendering financial data.</p>
+                        
+                        <h3>2.3 Performance Optimizations</h3>
+                        <p>Axis tick throttling implements a 100ms settling delay to prevent continuous marker regeneration during user interactions. Axis ticks are throttled during panning/zooming operations, with time-based settling logic that triggers tick updates only after user movement pauses. Axes remain hidden during active panning to reduce overhead, reappearing once the user stops moving the viewport.</p>
+                        
+                        <p>Data synchronization employs thread safety through mutexes that guard all chart data mutations. This ensures visuals update from a single thread, preventing race conditions during interval switches. Arrays are validated before GPU uploads to catch data corruption early, and overlay references are updated in-place to avoid visual flickering during data updates. Consolidated overlay updates batch multiple overlay changes into single rendering operations per frame instead of per-overlay updates. Deferred overlay updates during panning reduce computational overhead by skipping expensive recalculations while the user is actively interacting with the chart.</p>
+                        
+                        <h3>2.4 VisPy Crash Prevention</h3>
+                        <p>Recent fixes address crashes during rapid interval switching through multiple mechanisms. Thread-safe data updates use mutex-protected mutations to prevent background threads from corrupting chart state when multiple operations happen simultaneously. Thread lifecycle management implements proper cleanup with reference tracking to prevent threading errors when components are destroyed whilst background work is still in progress.</p>
+                        
+                        <p>An orderly shutdown cascade ensures clean teardown when the application or individual chart components are closed. Thread-unsafe operations have been removed from worker threads, with all UI operations restricted to the UI thread to prevent race conditions and undefined behaviour. These improvements have dramatically increased system stability during rapid user interactions.</p>
+                        
+                        <h2>3. Technical Analysis & Sweep Detection</h2>
+                        <p>The analysis capabilities represent the foundation of an expanding tooling suite. Whilst the long-term vision focuses on AI model training and autonomous trading, the near-term goal is to enhance human trading ability through sophisticated pattern recognition and market structure analysis. Significant additional tooling and analytical features are planned for future development to support both manual trading decisions and eventual model training workflows.</p>
+                        
+                        <h3>3.1 Advanced SMC Pattern Recognition</h3>
+                        <p>Valgo implements research-based Smart Money Concepts (SMC) detection with four sweep types that identify institutional trading patterns. Buy-side sweeps and sell-side sweeps provide basic liquidity sweep detection using pivot levels, identifying where price touches significant swing highs or lows. These patterns support configurable lookback periods and confirmation requirements, with wick ratio thresholds that prevent false triggers on minor touches.</p>
+                        
+                        <p>Break of structure detection uses multi-pivot pattern recognition to identify structural breaks. Research-based pattern matching detects market directional changes using volatility-based adaptation with adaptive multipliers. Proximity-based deduplication filters nearby detections to avoid duplicate signals, while higher timeframe validation cross-references patterns across multiple timeframes for confirmation. Break quality scoring rates pattern strength, helping traders distinguish high-probability setups from marginal ones.</p>
+                        
+                        <p>Change of character detection identifies behavioral pattern changes and shifts in market character and volatility structure. This complements break of structure detection for comprehensive pattern recognition, with session-aware analysis that adjusts parameters by trading session to account for different market behaviors during Asian, London, and New York sessions.</p>
+                        
+                        <h3>3.2 Analysis Engine</h3>
+                        <p>The technical analysis engine orchestrates comprehensive market analysis through several mechanisms. A TTL-based cache stores expensive computation results, preventing redundant calculations when analyzing the same data. Optional GPU acceleration provides high-performance pivot detection and volatility calculations when a compatible GPU is available. Volatility-normalized analysis adjusts sweep detection thresholds based on current market conditions, while parameter scaling adapts analysis parameters with time.</p>
+                        
+                        <p>Market-specific tuning uses timeframe-specific volatility multipliers calibrated for forex markets, with support for multiple timeframes and hierarchical monitoring. Pivot detection identifies swing highs and lows with configurable parameters, categorizes pivot types based on their characteristics, and offers optional GPU-accelerated analysis for high-frequency computation when processing large datasets.</p>
+                        
+                        <p>The caching strategy deduplicates computation via fingerprinting, ensuring identical analysis requests return cached results. TTL-based expiry prevents stale analysis by automatically invalidating old results, while persistence enables cache survival across sessions so frequently-used analyses don't need to be recalculated after application restarts.</p>
+                        
+                        <h3>3.3 GPU Acceleration (Optional)</h3>
+                        <p>High-performance GPU acceleration with CUDA support provides dramatic performance improvements for computationally intensive operations. The system manages GPU memory allocation efficiently to maximize throughput while preventing memory exhaustion. Large datasets are processed directly in GPU memory to minimize data transfer overhead, with automatic fallback to CPU if the GPU is unavailable or computation fails for any reason.</p>
+                        
+                        <h2>4. Data Management & Streaming</h2>
+                        <h3>4.1 Market Data Sources</h3>
+                        <p>External API integration provides RESTful API access for historical candle data and streaming API for real-time price ticks. Bearer token authentication secures API access, with configurable endpoints allowing switching between different data providers or environments. Error handling with retry logic ensures temporary network issues don't cause data loss or application crashes.</p>
+                        
+                        <p>A demo data source provides simulated candlestick data for testing without credentials and synthetic price streaming for UI development and demos. The demo source maintains an identical interface to the production client, enabling seamless switching between demo and live data without code changes. Data fetcher abstraction uses an abstract contract that enables multiple providers, with a factory pattern handling instantiation. The system supports graceful degradation to demo mode if the external API is unavailable, ensuring the application remains functional for testing and development even without API credentials.</p>
+                        
+                        <h3>4.2 Real-Time Streaming</h3>
+                        <p>The threading model uses background thread management for price subscriptions, isolating network I/O from the UI thread. A signal-slot mechanism emits ticks to the UI thread safely, preventing race conditions and ensuring thread-safe updates. Configurable tick throttling prevents overwhelming the system during high-frequency price updates, with automatic thread cleanup on application shutdown preventing resource leaks.</p>
+                        
+                        <p>A resync timer implements periodic historical data refresh to validate streaming data consistency against latest historical candles. This catches any missed ticks or data discrepancies between the streaming and historical feeds. The system lazy loads additional historical data when needed, particularly when users pan into time ranges that haven't been loaded yet. New candles are appended without full re-initialization, maintaining smooth user experience during live data updates.</p>
+                        
+                        <p>Data transformation converts API responses to numeric arrays optimized for GPU processing and identifies only new candles after previous state to avoid redundant processing. An aggregation module converts base granularity data to higher timeframes on-demand, allowing users to switch between timeframes without fetching new data from the API.</p>
+                        
+                        <h3>4.3 Persistence</h3>
+                        <p>The database schema provides OHLCV data storage with unique constraints preventing duplicate candles, camera position and zoom state persistence for seamless session resumption, and cached analysis results with TTL to balance performance and freshness. All UI state is stored in the database rather than configuration files, with user-defined favorite timeframes and metadata tables supporting application operations.</p>
+                        
+                        <p>Write-ahead logging enables better concurrency without sacrificing durability, allowing multiple operations to proceed simultaneously without blocking. User preferences storage keeps all user settings in the database rather than files, including window geometry, layout preferences, selected instruments, and theme preferences. This enables preferences survival across sessions and application restarts, ensuring users always return to their customized environment.</p>
+                        
+                        <h2>5. User Interface & Interaction</h2>
+                        <h3>5.1 Main Window</h3>
+                        <p>The frameless custom title bar on Windows integrates with native window features while providing custom title bar implementation. This gives the application a modern, polished appearance while supporting drag/drop for chart rearrangement. The layout includes a left sidebar for navigation and instrument selection, right sidebar for overlay toggles and analysis controls, center chart area with multi-chart support, top toolbar with search, interval selection, and style menus, bottom bar for time/date display and status, and right panel for advanced controls.</p>
+                        
+                        <h3>5.2 Chart Interactions</h3>
+                        <p>Toolbar controls provide a symbol search for browsing available instruments, interval menu for configurable timeframe selection with custom favorites, date range control for historical data loading, visual style selection offering multiple rendering mode options, and async loading for smooth transitions without blocking the UI. Container management handles multi-chart layout with drag-drop rearrangement support, layout position persistence, and active chart focus management ensuring keyboard and mouse inputs go to the intended chart.</p>
+                        
+                        <h3>5.3 Keyboard & Mouse Controls</h3>
+                        <p>Mouse controls allow panning charts by dragging, zooming via mouse wheel, accessing right-click context menus, and hover interactions for detailed information about specific chart elements. Keyboard controls include arrow keys for panning, zoom shortcuts for quick zoom in/out operations, and interval change shortcuts for rapid timeframe switching during analysis.</p>
+                        
+                        <h2>6. Configuration & Extensibility</h2>
+                        <h3>6.1 Configuration Schema</h3>
+                        <p>Application defaults cover UI component settings, chart rendering and appearance settings, overlay visibility settings, core application settings, and infrastructure settings. Configuration sources include YAML/JSON file-based configuration for default values, environment variable access for deployment-specific overrides, CLI parameter overrides for development and testing, and merge strategies for composition allowing multiple configuration sources to combine.</p>
+                        
+                        <h3>6.2 Customization Points</h3>
+                        <p>Extension points enable adding domain events for new business events, use cases for new application workflows, command handlers for new user actions, persistence adapters for new storage backends, UI widgets for new interface components, visual overlays for new chart decorations, and registration in the dependency injection container to wire everything together. This extensibility ensures the system can evolve to meet new requirements without extensive refactoring.</p>
+                        
+                        <h2>7. Development & Quality Assurance</h2>
+                        <h3>7.1 Type Safety</h3>
+                        <p>Static type checking with strict checking enabled targets Python 3.13.8 with comprehensive type hints throughout the codebase. Type checking is integrated into the development workflow, catching type errors before runtime. Type-first design uses dataclasses for commands, events, and configurations, generic types for repositories and services, and optional type parameters for GPU/CPU code paths that may not always be available.</p>
+                        
+                        <h3>7.2 Linting & Code Quality</h3>
+                        <p>Code quality tools include a modern linter with auto-fix capabilities, enforced code style consistency across the entire codebase, plugin support for specialized checks, and integration into the development workflow. Code style preferences emphasize minimal comments with self-explanatory code preferred, top-level imports to expose dependencies clearly, composition over mixins for better maintainability, and explicit error messages that aid debugging.</p>
+                        
+                        <h3>7.3 Testing Infrastructure</h3>
+                        <p>Test organization separates core domain and application layer tests, infrastructure adapter tests, utility and dependency injection tests, GUI component tests, and performance benchmarks and stress tests. This organization allows running different test suites based on what code has changed, speeding up development cycles while maintaining comprehensive coverage.</p>
+                        
+                        <h2>8. Known Achievements & Optimizations</h2>
+                        <h3>8.1 Performance Wins</h3>
+                        <p>Major performance achievements include axis tick throttling where settling delays prevent axis regeneration during interactions, mutex-protected data operations providing thread-safe chart updates that prevent crashes, lazy loading with viewport-driven historical data loading in live view mode, consolidated rendering using batch rendering to reduce GPU submission overhead, optional GPU acceleration for computationally heavy operations, and level-of-detail rendering that adjusts visual detail based on zoom level.</p>
+                        
+                        <h3>8.2 Advanced Features</h3>
+                        <p>Advanced capabilities include Smart Money Concepts pattern detection with multi-pattern recognition, volatility adaptation using adaptive parameter adjustment for market regime awareness, higher timeframe validation providing cross-timeframe confirmation to prevent false signals, session-aware analysis with market-specific structure tuning and session adjustments, multi-chart interface offering independent chart containers with synchronized intervals, and real-time streaming achieving sub-millisecond tick processing with no UI freezing.</p>
+                        
+                        <h3>8.3 Architectural Strengths</h3>
+                        <p>Architectural benefits include clean separation where strict layer boundaries enable independent testing and evolution, event-driven communication that decouples components for maintainability, persistence abstraction enabling database independence and provider swapping, dependency injection providing centralized dependency management that simplifies testing and refactoring, and composition-based design offering flexible component systems without inheritance complexity.</p>
+                        
+                        <h2>9. Technology Stack</h2>
+                        <p>The technology stack consists of GPU-accelerated visualisation with Qt framework for the frontend, Python 3.13.8 with SQLite 3 using Write-Ahead Logging for the backend, optional GPU acceleration with CUDA support for computational performance, forex/CFD market data provider integration for live data feeds, static type checking and modern linting tools for development quality assurance, and an architecture built on Domain-Driven Design, CQRS, Event-Driven principles, and Clean Architecture patterns.</p>
+                        
+                        <h2>Conclusion</h2>
+                        <p>Valgo is an in-house financial charting and analysis platform being built with clean architectural principles and technical analysis capabilities. It combines GPU-accelerated rendering, pattern detection, state management, and clean architecture to support systematic market analysis and AI model training. The codebase prioritises performance, maintainability, and extensibility whilst maintaining strict type safety and testing infrastructure. Ongoing performance optimisations address rendering challenges whilst expanding the feature set for traders and quantitative researchers analysing market structure patterns.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</body>
+
+</html>
