@@ -47,6 +47,10 @@ body {
     padding: 220px 0 40px 0;
 }
 
+.section.blog + .section.blog > .content {
+    padding-top: 60px;
+}
+
 .section h1 {
     margin-left: var(--font--margin-left);
     font-size: var(--font--size-huge);
