@@ -104,6 +104,8 @@
     color: inherit;
     text-decoration: none;
     transition: color 0.2s ease;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .blog-nav .toc-item.level-2 {
@@ -227,11 +229,11 @@ body {
 }
 
 .blog-container .title {
-    font-size: 32px;
+    font-size: 60px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 16px;
-    line-height: 1.3;
+    line-height: 1.1;
 }
 
 .blog-container .title a {
@@ -291,6 +293,31 @@ body {
     margin: 0;
     text-align: justify;
     font-weight: 400;
+}
+
+.blog-container .overview h1,
+.blog-container .overview h2,
+.blog-container .overview h3,
+.blog-container .overview h4,
+.blog-container .overview h5,
+.blog-container .overview h6 {
+    margin: 26px 0 14px;
+    line-height: 1.24;
+}
+
+.blog-container .overview h1:first-child,
+.blog-container .overview h2:first-child,
+.blog-container .overview h3:first-child,
+.blog-container .overview h4:first-child,
+.blog-container .overview h5:first-child,
+.blog-container .overview h6:first-child {
+    margin-top: 0;
+}
+
+.blog-container .overview h4,
+.blog-container .overview h5,
+.blog-container .overview h6 {
+    margin-top: 22px;
 }
 
 .blog-container .overview code {

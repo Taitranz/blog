@@ -7,7 +7,7 @@ const OUTPUT_DIR = path.join(__dirname, "..", "posts", "markdown");
 
 async function main() {
     try {
-        const args = parseArgs(process.argv.slice(2));
+        const args = mergeEnvArgs(parseArgs(process.argv.slice(2)));
         const title = await requireValue(args, "title", "Post title");
         const description = await requireValue(args, "description", "Short description");
         const tagsInput = await requireValue(args, "tags", "Comma-separated tags (e.g. tag1,tag2)");
@@ -50,10 +50,11 @@ async function main() {
 }
 
 function parseArgs(rawArgs) {
-    const args = {};
+    const args = { _: [] };
     for (let i = 0; i < rawArgs.length; i += 1) {
         const token = rawArgs[i];
         if (!token.startsWith("-")) {
+            args._.push(token);
             continue;
         }
 
@@ -72,6 +73,57 @@ function parseArgs(rawArgs) {
             args[key] = true;
         }
     }
+
+    applyPositionals(args);
+    return args;
+}
+
+function applyPositionals(args) {
+    if (!Array.isArray(args._) || args._.length === 0) {
+        return;
+    }
+
+    const [posTitle, posDescription, posTags, posDate] = args._;
+
+    if (!args.title && posTitle) {
+        args.title = posTitle;
+    }
+
+    if (!args.description && posDescription) {
+        args.description = posDescription;
+    }
+
+    if (!args.tags && posTags) {
+        args.tags = posTags;
+    }
+
+    if (!args.date && posDate) {
+        args.date = posDate;
+    }
+}
+
+function mergeEnvArgs(args) {
+    const envMappings = {
+        title: process.env.npm_config_title,
+        description: process.env.npm_config_description,
+        tags: process.env.npm_config_tags,
+        date: process.env.npm_config_date,
+        slug: process.env.npm_config_slug,
+        force: process.env.npm_config_force,
+    };
+
+    Object.entries(envMappings).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === "") {
+            return;
+        }
+
+        if (key === "force") {
+            args[key] = value;
+        } else if (args[key] === undefined || args[key] === true) {
+            args[key] = value;
+        }
+    });
+
     return args;
 }
 
