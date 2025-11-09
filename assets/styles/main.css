@@ -48,6 +48,13 @@
     flex-direction: column;
     z-index: 99;
     overflow-y: auto;
+    /* Hide scrollbar but keep scrolling functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.blog-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 .blog-nav div {

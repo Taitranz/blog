@@ -66,7 +66,8 @@ async function buildPosts() {
         });
 
         const outputPath = path.join(OUTPUT_DIR, `${slug}.html`);
-        await fs.writeFile(outputPath, rendered.trim() + "\n", "utf8");
+        const minified = minifyHtml(rendered);
+        await fs.writeFile(outputPath, minified, "utf8");
 
         console.log(`✓ Built ${outputPath}`);
     }
@@ -167,7 +168,7 @@ function renderMarkdownWithToc(markdown, description) {
         slugCounts.set(baseSlug, count + 1);
         const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`;
 
-        if (depth >= 2 && depth <= 6 && depth !== 3) {
+        if (depth === 2) {
             headings.push({
                 level: depth,
                 text: stripHtml(renderedText),
@@ -318,8 +319,9 @@ function renderTocNodes(nodes, depth) {
     return nodes
         .map((node) => {
             const nodeClass = ` level-${node.level}`;
+            const brokenText = breakLongTitle(node.text);
             let html = `${indent}<div class="item toc-item${nodeClass}" data-target="${node.slug}">\n`;
-            html += `${indent}    <a href="#${node.slug}">${escapeHtml(node.text)}</a>\n`;
+            html += `${indent}    <a href="#${node.slug}">${brokenText}</a>\n`;
             html += `${indent}</div>`;
 
             if (node.children && node.children.length > 0) {
@@ -332,8 +334,56 @@ function renderTocNodes(nodes, depth) {
         .join("\n");
 }
 
+/**
+ * Break long titles at appropriate points (after periods, or at word boundaries).
+ */
+function breakLongTitle(text, maxLength = 50) {
+    if (!text || text.length <= maxLength) {
+        return escapeHtml(text);
+    }
+
+    // Try to break after periods first - look for periods that are in a good position
+    // (not too early, ideally around 40-60% of the text length)
+    const periodMatches = [];
+    for (let i = 0; i < text.length; i++) {
+        if (text[i] === '.' && i > 20 && i < text.length - 10) {
+            periodMatches.push(i);
+        }
+    }
+
+    // Find the best period to break at (closest to maxLength but not exceeding it)
+    for (const periodIndex of periodMatches) {
+        if (periodIndex <= maxLength + 10) {
+            const beforePeriod = text.substring(0, periodIndex + 1).trim();
+            const afterPeriod = text.substring(periodIndex + 1).trim();
+            if (afterPeriod) {
+                return escapeHtml(beforePeriod) + '<br>' + escapeHtml(afterPeriod);
+            }
+        }
+    }
+
+    // Try to break at word boundaries
+    const words = text.split(/\s+/);
+    let firstLine = '';
+    let secondLine = '';
+
+    for (const word of words) {
+        if ((firstLine + ' ' + word).length <= maxLength) {
+            firstLine += (firstLine ? ' ' : '') + word;
+        } else {
+            secondLine += (secondLine ? ' ' : '') + word;
+        }
+    }
+
+    if (secondLine) {
+        return escapeHtml(firstLine) + '<br>' + escapeHtml(secondLine);
+    }
+
+    return escapeHtml(text);
+}
+
 function buildDescriptionTocItem(description) {
-    const label = escapeHtml(description || "Description");
+    const label = breakLongTitle(description || "Description");
     return `            <div class="item toc-item level-description" data-target="post-top">\n                <a href="#post-top">${label}</a>\n            </div>`;
 }
 
@@ -365,6 +415,52 @@ function fillTemplate(template, data) {
     return Object.entries(data).reduce((acc, [key, value]) => {
         return acc.split(`{{${key}}}`).join(value);
     }, template);
+}
+
+/**
+ * Minify HTML by removing unnecessary whitespace.
+ */
+function minifyHtml(html) {
+    if (typeof html !== "string") {
+        return html;
+    }
+
+    // Preserve whitespace in pre, code, textarea, script, and style blocks
+    const preservedBlocks = [];
+    let blockIndex = 0;
+    
+    // Match opening and closing tags more carefully to handle nested tags
+    const blockPattern = /<(pre|code|textarea|script|style)([^>]*)>([\s\S]*?)<\/\1>/gi;
+    html = html.replace(blockPattern, (match, tag, attrs, content) => {
+        const placeholder = `__PRESERVED_BLOCK_${blockIndex++}__`;
+        preservedBlocks.push({ placeholder, content: match });
+        return placeholder;
+    });
+
+    // Remove HTML comments
+    html = html.replace(/<!--[\s\S]*?-->/g, "");
+
+    // Collapse whitespace between tags (but keep single newline for readability in some cases)
+    html = html.replace(/>\s+</g, "><");
+
+    // Remove leading/trailing whitespace from each line
+    html = html.replace(/^[ \t]+|[ \t]+$/gm, "");
+
+    // Collapse multiple consecutive newlines into single newline
+    html = html.replace(/\n{3,}/g, "\n\n");
+
+    // Collapse multiple spaces into single space (but preserve in preserved blocks)
+    html = html.replace(/[ \t]{2,}/g, " ");
+
+    // Remove spaces before closing tags
+    html = html.replace(/[ \t]+>/g, ">");
+
+    // Restore preserved blocks
+    preservedBlocks.forEach(({ placeholder, content }) => {
+        html = html.replace(placeholder, content);
+    });
+
+    return html.trim();
 }
 
 /**
@@ -501,6 +597,7 @@ async function updateIndexHtml(posts) {
     const updatedBlogs = replaceBlogsSection(updatedOverview.html, blogsContent, lineBreak, blogContainerIndent);
 
     if (updatedOverview.changed || updatedBlogs.changed) {
+        // Temporarily disable minification for index.html to fix TOC
         await fs.writeFile(INDEX_PATH, updatedBlogs.html, "utf8");
         console.log(`✓ Updated ${path.relative(process.cwd(), INDEX_PATH)}`);
     } else {
@@ -651,7 +748,7 @@ function findIndentation(html, marker, tag) {
 }
 
 /**
- * Parse blog date strings in DD-MM-YYYY or YYYY-MM-DD format.
+ * Parse blog date strings in ISO format (YYYY-MM-DDTHH:mm:ss+TZ), DD-MM-YYYY, or YYYY-MM-DD format.
  */
 function parsePostDate(value) {
     const trimmed = String(value || "").trim();
@@ -659,6 +756,13 @@ function parsePostDate(value) {
         return null;
     }
 
+    // Try ISO date format first (e.g., "2025-11-10T12:00:00+10:00")
+    const isoDate = new Date(trimmed);
+    if (!Number.isNaN(isoDate.getTime())) {
+        return isoDate;
+    }
+
+    // Fall back to DD-MM-YYYY or YYYY-MM-DD format
     const parts = trimmed.split("-").map((part) => part.trim());
     if (parts.length !== 3) {
         return null;
