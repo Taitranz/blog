@@ -294,6 +294,34 @@ body {
     font-weight: 400;
 }
 
+.blog-container .overview code {
+    font-family: "Courier New", Courier, monospace;
+    background: #f6f8fb;
+    color: #1a1a1a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.blog-container .overview pre {
+    background: #f6f8fb;
+    border: 1px solid #e3e7ee;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 24px 0;
+    overflow-x: auto;
+}
+
+.blog-container .overview pre code {
+    display: block;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre;
+}
+
 .section.intro>.content {
     padding: calc(var(--grid--app-xheight) - 11px) 0 80px 0;
     position: relative;
