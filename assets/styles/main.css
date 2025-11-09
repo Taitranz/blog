@@ -224,7 +224,6 @@ body {
     background: #ffffff;
     border-radius: 8px;
     padding: 40px;
-    border: 1px solid #f0f0f0;
 }
 
 .blog-container .title {
@@ -320,6 +319,61 @@ body {
     font-size: 14px;
     line-height: 1.6;
     white-space: pre;
+}
+
+.blog-container .overview pre.has-copy {
+    position: relative;
+    padding-top: 44px;
+}
+
+.copy-code-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    padding: 6px 10px;
+    font-size: 12px;
+    line-height: 1;
+    font-family: inherit;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    color: #1a1a1a;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.copy-code-btn:hover,
+.copy-code-btn:focus {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.copy-code-btn:focus {
+    outline: none;
+}
+
+.copy-code-btn:focus-visible {
+    outline: 2px solid #1a1a1a;
+    outline-offset: 2px;
+}
+
+.blog-container .overview pre.has-copy:hover .copy-code-btn,
+.blog-container .overview pre.has-copy:focus-within .copy-code-btn {
+    opacity: 1;
+}
+
+.copy-code-btn.copy-success {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.copy-code-btn.copy-error {
+    background: #ffecec;
+    border-color: #ffb3b3;
+    color: #a32121;
 }
 
 .section.intro>.content {

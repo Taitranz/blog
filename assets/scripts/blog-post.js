@@ -111,3 +111,87 @@ window.addEventListener("resize", () => {
     }
 });
 
+(function attachCopyButtons() {
+    const codeBlocks = document.querySelectorAll(".blog-main pre > code");
+    if (!codeBlocks || codeBlocks.length === 0) {
+        return;
+    }
+
+    const resetDelay = 1500;
+
+    const fallbackCopy = (text) => {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.pointerEvents = "none";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        const success = document.execCommand("copy");
+        document.body.removeChild(textarea);
+
+        if (!success) {
+            throw new Error("document.execCommand('copy') returned false");
+        }
+    };
+
+    codeBlocks.forEach((codeBlock) => {
+        const pre = codeBlock.parentElement;
+        if (!pre || pre.querySelector(".copy-code-btn")) {
+            return;
+        }
+
+        pre.classList.add("has-copy");
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "copy-code-btn";
+        button.setAttribute("aria-label", "Copy code to clipboard");
+        button.textContent = "Copy";
+
+        let resetTimer = null;
+
+        const setFeedback = (message, stateClass) => {
+            button.textContent = message;
+            button.classList.remove("copy-success", "copy-error");
+            if (stateClass) {
+                button.classList.add(stateClass);
+            }
+
+            if (resetTimer) {
+                clearTimeout(resetTimer);
+            }
+
+            resetTimer = window.setTimeout(() => {
+                button.textContent = "Copy";
+                button.classList.remove("copy-success", "copy-error");
+            }, resetDelay);
+        };
+
+        button.addEventListener("click", async () => {
+            const text = codeBlock.textContent || "";
+            if (!text.trim()) {
+                setFeedback("No code", "copy-error");
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && typeof navigator.clipboard.writeText === "function" && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    fallbackCopy(text);
+                }
+                setFeedback("Copied!", "copy-success");
+            } catch (error) {
+                console.error("Failed to copy code block:", error);
+                setFeedback("Copy failed", "copy-error");
+            }
+        });
+
+        pre.appendChild(button);
+    });
+})();
+
