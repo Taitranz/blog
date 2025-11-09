@@ -83,6 +83,34 @@
     font-size: 16px;
 }
 
+.blog-nav .toc-heading {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+    color: var(--nav-item-hover);
+    pointer-events: none;
+}
+
+.blog-nav .toc-item a {
+    display: block;
+    padding: 4px 0;
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.blog-nav .toc-item.level-3 {
+    padding-left: 16px;
+    font-size: 14px;
+}
+
+.blog-nav .toc-empty {
+    font-size: 14px;
+    color: #999;
+    pointer-events: none;
+}
+
 .hamburger-menu-centered {
     display: none;
     cursor: pointer;

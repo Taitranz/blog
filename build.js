@@ -35,13 +35,18 @@ async function buildPosts() {
         const markdownPath = path.join(SOURCE_DIR, file);
         const { data, content } = matter(await fs.readFile(markdownPath, "utf8"));
 
-        validateFrontmatter(file, data);
+        try {
+            validateFrontmatter(file, data);
+        } catch (error) {
+            console.warn(`Skipping ${file}: ${error.message}`);
+            continue;
+        }
 
         const slug = data.slug || file.replace(/\.md$/i, "");
         const urlFromFrontmatter = typeof data.url === "string" ? data.url.trim() : "";
         const canonicalUrl = urlFromFrontmatter || `${ROOT_URL}/posts/${slug}.html`;
 
-        const htmlContent = marked.parse(content);
+        const { html: htmlContent, tocHtml } = renderMarkdownWithToc(content);
 
         const rendered = fillTemplate(template, {
             title: escapeHtml(data.title),
@@ -50,6 +55,7 @@ async function buildPosts() {
             url: canonicalUrl,
             date: escapeHtml(data.date || ""),
             tags: buildTagsHtml(data.tags),
+            toc: tocHtml,
             content: htmlContent,
         });
 
@@ -135,6 +141,74 @@ function buildTagsHtml(tags) {
         .filter(Boolean)
         .map((tag) => `                            <div class="tag">\n                                ${escapeHtml(tag)}\n                            </div>`)
         .join("\n");
+}
+
+/**
+ * Render markdown to HTML while generating a table of contents.
+ */
+function renderMarkdownWithToc(markdown) {
+    const headings = [];
+    const renderer = new marked.Renderer();
+    const slugCounts = new Map();
+
+    renderer.heading = function ({ tokens, depth }) {
+        const renderedText = this.parser.parseInline(tokens);
+        const baseSlug = slugify(stripHtml(renderedText));
+        const count = slugCounts.get(baseSlug) || 0;
+        slugCounts.set(baseSlug, count + 1);
+        const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`;
+
+        if (depth === 2 || depth === 3) {
+            headings.push({
+                level: depth,
+                text: stripHtml(renderedText),
+                slug,
+            });
+        }
+        return `<h${depth} id="${slug}">${renderedText}</h${depth}>\n`;
+    };
+
+    const html = marked.parse(markdown, { renderer });
+    const tocHtml = buildTocHtml(headings);
+
+    return { html, tocHtml };
+}
+
+/**
+ * Build TOC markup from heading data.
+ */
+function buildTocHtml(headings) {
+    if (headings.length === 0) {
+        return "        <div class=\"item toc-empty\">No sections available</div>";
+    }
+
+    return headings
+        .map(({ level, text, slug }) => {
+            const levelClass = level === 3 ? " level-3" : " level-2";
+            return `        <div class="item toc-item${levelClass}" data-target="${slug}">\n            <a href="#${slug}">${escapeHtml(text)}</a>\n        </div>`;
+        })
+        .join("\n");
+}
+
+/**
+ * Strip HTML tags from text.
+ */
+function stripHtml(value) {
+    return String(value || "").replace(/<[^>]*>/g, "");
+}
+
+/**
+ * Convert heading text into a URL-friendly slug.
+ */
+function slugify(value) {
+    return String(value || "")
+        .toLowerCase()
+        .trim()
+        .replace(/&amp;/g, "and")
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "") || "section";
 }
 
 /**
