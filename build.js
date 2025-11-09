@@ -3,6 +3,7 @@ const fs = require("fs-extra");
 const matter = require("gray-matter");
 const { marked } = require("marked");
 const cheerio = require("cheerio");
+const hljs = require("highlight.js");
 
 const ROOT_URL = "https://blog.taitranz.com";
 const SOURCE_DIR = path.join(__dirname, "posts", "markdown");
@@ -166,7 +167,7 @@ function renderMarkdownWithToc(markdown, description) {
         slugCounts.set(baseSlug, count + 1);
         const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`;
 
-        if (depth >= 2 && depth <= 6) {
+        if (depth >= 2 && depth <= 6 && depth !== 3) {
             headings.push({
                 level: depth,
                 text: stripHtml(renderedText),
@@ -174,6 +175,21 @@ function renderMarkdownWithToc(markdown, description) {
             });
         }
         return `<h${depth} id="${slug}">${renderedText}</h${depth}>\n`;
+    };
+
+    renderer.code = function ({ text, lang }) {
+        const language = lang || "";
+        let highlighted;
+        if (lang) {
+            try {
+                highlighted = hljs.highlight(text, { language: lang }).value;
+            } catch (err) {
+                highlighted = escapeHtml(text);
+            }
+        } else {
+            highlighted = escapeHtml(text);
+        }
+        return `<pre><code class="hljs${language ? ` language-${language}` : ""}">${highlighted}</code></pre>\n`;
     };
 
     const html = marked.parse(markdown, { renderer });
@@ -386,6 +402,21 @@ async function extractPostMetadata(htmlPath) {
         .get()
         .filter(Boolean);
 
+    // Extract banner image if present
+    const bannerImg = $(".blog-container .blog-banner img").first();
+    let bannerImageSrc = null;
+    let bannerImageAlt = "";
+    
+    if (bannerImg.length) {
+        bannerImageSrc = bannerImg.attr("src");
+        bannerImageAlt = bannerImg.attr("alt") || "";
+        
+        // Convert relative path from blog post (../../assets/) to index.html path (assets/)
+        if (bannerImageSrc && bannerImageSrc.startsWith("../../")) {
+            bannerImageSrc = bannerImageSrc.replace("../../", "");
+        }
+    }
+
     const fileName = path.basename(htmlPath);
 
     return {
@@ -395,6 +426,8 @@ async function extractPostMetadata(htmlPath) {
         dateDisplay: dateText,
         dateValue,
         tags,
+        bannerImageSrc,
+        bannerImageAlt,
     };
 }
 
@@ -567,11 +600,21 @@ function renderBlogContainers(posts, baseIndent) {
             }
             tagsLines.push(`${indent2}</div>`);
 
+            const imageLines = [];
+            if (post.bannerImageSrc) {
+                imageLines.push(
+                    `${indent1}<div class="blog-listing-image">`,
+                    `${indent2}<img src="${escapeHtml(post.bannerImageSrc)}" alt="${escapeHtml(post.bannerImageAlt || post.title)}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-top: 0;">`,
+                    `${indent1}</div>`
+                );
+            }
+
             return [
                 `${baseIndent}<div class="blog-container">`,
                 `${indent1}<div class="title">`,
                 `${indent2}<a href="${escapeHtml(post.href)}">${escapeHtml(post.title)} <span style="font-size: 14px; font-weight: 400; color: #999; letter-spacing: -0.3px;">(click me)</span></a>`,
                 `${indent1}</div>`,
+                ...imageLines,
                 `${indent1}<div class="details">`,
                 `${indent2}<div class="date">`,
                 `${indent3}${escapeHtml(post.dateDisplay)}`,

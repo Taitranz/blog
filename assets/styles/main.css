@@ -255,6 +255,10 @@ body {
     letter-spacing: -0.04em;
 }
 
+.section.blogs .blog-container .title {
+    margin-bottom: 0;
+}
+
 .blog-container .title a {
     color: #1a1a1a;
     text-decoration: none;
@@ -367,6 +371,30 @@ body {
     font-size: 14px;
     line-height: 1.6;
     white-space: pre;
+}
+
+.blog-container .overview pre code.hljs {
+    background: transparent;
+    padding: 0;
+}
+
+.blog-container .overview ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 16px 0;
+}
+
+.blog-container .overview li {
+    position: relative;
+    padding-left: 20px;
+    margin: 8px 0;
+}
+
+.blog-container .overview li::before {
+    content: "-";
+    position: absolute;
+    left: 0;
+    color: #1a1a1a;
 }
 
 .blog-container .overview pre.has-copy {
