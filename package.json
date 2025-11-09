@@ -1,0 +1,31 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js",
+    "prepare": "husky",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Taitranz/blog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Taitranz/blog/issues"
+  },
+  "homepage": "https://github.com/Taitranz/blog#readme",
+  "dependencies": {
+    "fs-extra": "^11.3.2",
+    "gray-matter": "^4.0.3",
+    "marked": "^17.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
