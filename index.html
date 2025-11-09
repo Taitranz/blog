@@ -31,6 +31,12 @@
     <link rel="stylesheet" href="assets/styles/main.css">
     <link rel="stylesheet" href="assets/styles/media-queries.css">
 
+    <script>
+        // Redirect /index.html to root URL
+        if (window.location.pathname.endsWith('/index.html')) {
+            window.location.replace(window.location.origin + window.location.pathname.replace('/index.html', '/'));
+        }
+    </script>
 
 </head>
 
@@ -133,6 +139,7 @@
                     
                     
                     
+                    
                                    
                     
                     
@@ -166,6 +173,7 @@
         <section class="section blogs">
             <div class="content">
                 <h2>Blogs</h2>
+                
                 
                 
                 
@@ -318,6 +326,7 @@
                         </div>
                     </div>
                 </div>
+                
                 
                 
                 
