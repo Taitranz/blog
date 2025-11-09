@@ -10,7 +10,7 @@ tags:
 
 # Building Posts with Markdown
 
-Writing posts in markdown keeps the authoring experience fast and flexible.
+Writing posts in markdown keeps the authoring experience fast and flexible.2
 
 ## Frontmatter Metadata
 
