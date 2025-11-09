@@ -450,6 +450,7 @@ async function updateIndexHtml(posts) {
     }
 
     let indexHtml = await fs.readFile(INDEX_PATH, "utf8");
+    const lineBreak = indexHtml.includes("\r\n") ? "\r\n" : "\n";
 
     const overviewUlIndent = findIndentation(indexHtml, '<div class="overview-toc">', "<ul>") || "                    ";
     const blogContainerIndent = findIndentation(
@@ -463,8 +464,8 @@ async function updateIndexHtml(posts) {
         blogContainerIndent,
     });
 
-    const updatedOverview = replaceOverviewList(indexHtml, overviewContent);
-    const updatedBlogs = replaceBlogsSection(updatedOverview.html, blogsContent);
+    const updatedOverview = replaceOverviewList(indexHtml, overviewContent, lineBreak, overviewUlIndent);
+    const updatedBlogs = replaceBlogsSection(updatedOverview.html, blogsContent, lineBreak, blogContainerIndent);
 
     if (updatedOverview.changed || updatedBlogs.changed) {
         await fs.writeFile(INDEX_PATH, updatedBlogs.html, "utf8");
@@ -477,7 +478,7 @@ async function updateIndexHtml(posts) {
 /**
  * Replace the Overview list content.
  */
-function replaceOverviewList(html, overviewContent) {
+function replaceOverviewList(html, overviewContent, lineBreak, ulIndent) {
     const overviewRegex = /(<div class="overview-toc">[\s\S]*?<ul>)([\s\S]*?)(\s*<\/ul>)/;
     const match = overviewRegex.exec(html);
 
@@ -486,7 +487,8 @@ function replaceOverviewList(html, overviewContent) {
         return { html, changed: false };
     }
 
-    const nextHtml = html.replace(overviewRegex, (_, start, _current, end) => `${start}${overviewContent}${end}`);
+    const block = overviewContent ? `${lineBreak}${overviewContent}${lineBreak}${ulIndent}` : "";
+    const nextHtml = html.replace(overviewRegex, (_, start, _current, end) => `${start}${block}${end}`);
 
     return { html: nextHtml, changed: nextHtml !== html };
 }
@@ -494,7 +496,7 @@ function replaceOverviewList(html, overviewContent) {
 /**
  * Replace the Blogs section listings.
  */
-function replaceBlogsSection(html, blogsContent) {
+function replaceBlogsSection(html, blogsContent, lineBreak, baseIndent) {
     const blogsRegex = /(<section class="section blogs">[\s\S]*?<h2>Blogs<\/h2>\s*)([\s\S]*?)(\s*<\/div>\s*<\/section>)/;
     const match = blogsRegex.exec(html);
 
@@ -503,7 +505,8 @@ function replaceBlogsSection(html, blogsContent) {
         return { html, changed: false };
     }
 
-    const nextHtml = html.replace(blogsRegex, (_, start, _current, end) => `${start}${blogsContent}${end}`);
+    const block = blogsContent ? `${lineBreak}${blogsContent}${lineBreak}${baseIndent}` : "";
+    const nextHtml = html.replace(blogsRegex, (_, start, _current, end) => `${start}${block}${end}`);
 
     return { html: nextHtml, changed: nextHtml !== html };
 }
@@ -513,11 +516,11 @@ function replaceBlogsSection(html, blogsContent) {
  */
 function renderOverviewList(posts, ulIndent) {
     if (!posts || posts.length === 0) {
-        return `\n${ulIndent}`;
+        return "";
     }
 
     const liIndent = `${ulIndent}    `;
-    const content = posts
+    return posts
         .map((post) => {
             const lines = [
                 `${liIndent}<li>`,
@@ -529,8 +532,6 @@ function renderOverviewList(posts, ulIndent) {
             return lines.join("\n");
         })
         .join("\n");
-
-    return `\n${content}\n${ulIndent}`;
 }
 
 /**
@@ -538,12 +539,12 @@ function renderOverviewList(posts, ulIndent) {
  */
 function renderBlogContainers(posts, baseIndent) {
     if (!posts || posts.length === 0) {
-        return `\n${baseIndent}`;
+        return "";
     }
 
     const step = "    ";
 
-    const content = posts
+    return posts
         .map((post) => {
             const indent1 = `${baseIndent}${step}`;
             const indent2 = `${indent1}${step}`;
@@ -581,8 +582,6 @@ function renderBlogContainers(posts, baseIndent) {
             ].join("\n");
         })
         .join("\n\n");
-
-    return `\n${content}\n${baseIndent}`;
 }
 
 /**
