@@ -221,6 +221,10 @@
         padding: calc(var(--grid--app-xheight) - 11px) 0 40px 0;
     }
 
+    .section.intro .intro-container h1 {
+        line-height: 1;
+    }
+
     .look {
         margin-top: -24px;
         margin-left: -7px;
@@ -307,8 +311,8 @@
         line-height: 1;
     }
 
-    .section.intro .text {
-        min-height: calc(1em * 7);
+    .section.intro .intro-container h1 {
+        line-height: 1;
     }
 
     .section.intro>.content {
@@ -466,6 +470,12 @@
 
     }
 
+    .blog-nav {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
     .hamburger-menu-centered {
         display: block;
         cursor: pointer;
@@ -485,10 +495,26 @@
         overflow-y: auto;
     }
 
+    .blog-nav.nav-visible {
+        position: fixed;
+        top: 220px;
+        left: 10px;
+        height: calc(100vh - var(--grid--app-xheight));
+        display: flex;
+        flex-direction: column;
+        z-index: 99;
+        overflow-y: auto;
+    }
+
     .portfolio-website-nav .item {
         font-size: 22px;
         padding: 4px calc(44px + var(--grid--app-margin)) 4px var(--grid--app-margin);
 
+    }
+
+    .blog-nav .item {
+        font-size: 22px;
+        padding: 4px calc(44px + var(--grid--app-margin)) 4px var(--grid--app-margin);
     }
 
     .section.work .content .project-container .overview .preview-container {
@@ -528,6 +554,12 @@
 
     }
 
+    .blog-nav {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
     .hamburger-menu-centered {
         display: block;
         cursor: pointer;
@@ -547,10 +579,26 @@
         overflow-y: auto;
     }
 
+    .blog-nav.nav-visible {
+        position: fixed;
+        top: 220px;
+        left: 10px;
+        height: calc(100vh - var(--grid--app-xheight));
+        display: flex;
+        flex-direction: column;
+        z-index: 99;
+        overflow-y: auto;
+    }
+
     .portfolio-website-nav .item {
         font-size: 22px;
         padding: 4px calc(44px + var(--grid--app-margin)) 4px var(--grid--app-margin);
 
+    }
+
+    .blog-nav .item {
+        font-size: 22px;
+        padding: 4px calc(44px + var(--grid--app-margin)) 4px var(--grid--app-margin);
     }
 
     .section.work .content .project-container .overview .preview-container {
