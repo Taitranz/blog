@@ -2,11 +2,14 @@ const path = require("path");
 const fs = require("fs-extra");
 const matter = require("gray-matter");
 const { marked } = require("marked");
+const cheerio = require("cheerio");
 
 const ROOT_URL = "https://blog.taitranz.com";
 const SOURCE_DIR = path.join(__dirname, "posts", "markdown");
 const OUTPUT_DIR = path.join(__dirname, "posts");
 const TEMPLATE_PATH = path.join(__dirname, "posts", "template.html");
+const INDEX_PATH = path.join(__dirname, "index.html");
+const BLOG_TITLE_SUFFIX = " — Tai Tran Blog";
 
 marked.setOptions({
     gfm: true,
@@ -64,6 +67,9 @@ async function buildPosts() {
 
         console.log(`✓ Built ${outputPath}`);
     }
+
+    const posts = await scanAllPosts();
+    await updateIndexHtml(posts);
 }
 
 /**
@@ -266,6 +272,312 @@ function escapeHtml(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+}
+
+/**
+ * Extract relevant metadata from a rendered blog HTML file.
+ */
+async function extractPostMetadata(htmlPath) {
+    const html = await fs.readFile(htmlPath, "utf8");
+    const $ = cheerio.load(html, { decodeEntities: false });
+
+    const rawTitle = $("head > title").first().text().trim();
+    const title = stripBlogTitleSuffix(rawTitle) || fallbackTitleFromPath(htmlPath);
+
+    const dateText = $(".blog-container .details .date").first().text().trim();
+    const dateValue = parsePostDate(dateText);
+
+    if (!dateValue) {
+        console.warn(`Skipping ${path.relative(__dirname, htmlPath)}: unable to parse date "${dateText}"`);
+        return null;
+    }
+
+    const tags = $(".blog-container .details .tags .tag")
+        .map((_, el) => $(el).text().trim())
+        .get()
+        .filter(Boolean);
+
+    const fileName = path.basename(htmlPath);
+
+    return {
+        fileName,
+        href: `posts/${fileName}`,
+        title,
+        dateDisplay: dateText,
+        dateValue,
+        tags,
+    };
+}
+
+/**
+ * Scan all generated HTML posts and sort them by date (newest first).
+ */
+async function scanAllPosts() {
+    const exists = await fs.pathExists(OUTPUT_DIR);
+    if (!exists) {
+        return [];
+    }
+
+    const entries = await fs.readdir(OUTPUT_DIR);
+    const htmlFiles = entries.filter(
+        (file) => file.toLowerCase().endsWith(".html") && file.toLowerCase() !== "template.html"
+    );
+
+    const posts = [];
+
+    for (const file of htmlFiles) {
+        const htmlPath = path.join(OUTPUT_DIR, file);
+        try {
+            const metadata = await extractPostMetadata(htmlPath);
+            if (metadata) {
+                posts.push(metadata);
+            }
+        } catch (error) {
+            console.warn(`Skipping ${path.relative(__dirname, htmlPath)}: ${error.message}`);
+        }
+    }
+
+    return posts.sort((a, b) => b.dateValue.getTime() - a.dateValue.getTime());
+}
+
+/**
+ * Build the Overview and Blogs sections markup.
+ */
+function generateBlogListingsHtml(posts, { overviewUlIndent, blogContainerIndent }) {
+    return {
+        overviewContent: renderOverviewList(posts, overviewUlIndent),
+        blogsContent: renderBlogContainers(posts, blogContainerIndent),
+    };
+}
+
+/**
+ * Update index.html with the provided post data.
+ */
+async function updateIndexHtml(posts) {
+    const indexExists = await fs.pathExists(INDEX_PATH);
+    if (!indexExists) {
+        console.warn(`index.html not found at ${path.relative(process.cwd(), INDEX_PATH)}. Skipping homepage update.`);
+        return;
+    }
+
+    let indexHtml = await fs.readFile(INDEX_PATH, "utf8");
+
+    const overviewUlIndent = findIndentation(indexHtml, '<div class="overview-toc">', "<ul>") || "                    ";
+    const blogContainerIndent = findIndentation(
+        indexHtml,
+        '<section class="section blogs">',
+        '<div class="blog-container">'
+    ) || "                ";
+
+    const { overviewContent, blogsContent } = generateBlogListingsHtml(posts, {
+        overviewUlIndent,
+        blogContainerIndent,
+    });
+
+    const updatedOverview = replaceOverviewList(indexHtml, overviewContent);
+    const updatedBlogs = replaceBlogsSection(updatedOverview.html, blogsContent);
+
+    if (updatedOverview.changed || updatedBlogs.changed) {
+        await fs.writeFile(INDEX_PATH, updatedBlogs.html, "utf8");
+        console.log(`✓ Updated ${path.relative(process.cwd(), INDEX_PATH)}`);
+    } else {
+        console.log("No changes detected for index.html");
+    }
+}
+
+/**
+ * Replace the Overview list content.
+ */
+function replaceOverviewList(html, overviewContent) {
+    const overviewRegex = /(<div class="overview-toc">[\s\S]*?<ul>)([\s\S]*?)(\s*<\/ul>)/;
+    const match = overviewRegex.exec(html);
+
+    if (!match) {
+        console.warn("Unable to locate overview list in index.html. Skipping update for Overview section.");
+        return { html, changed: false };
+    }
+
+    const nextHtml = html.replace(overviewRegex, (_, start, _current, end) => `${start}${overviewContent}${end}`);
+
+    return { html: nextHtml, changed: nextHtml !== html };
+}
+
+/**
+ * Replace the Blogs section listings.
+ */
+function replaceBlogsSection(html, blogsContent) {
+    const blogsRegex = /(<section class="section blogs">[\s\S]*?<h2>Blogs<\/h2>\s*)([\s\S]*?)(\s*<\/div>\s*<\/section>)/;
+    const match = blogsRegex.exec(html);
+
+    if (!match) {
+        console.warn("Unable to locate blogs section in index.html. Skipping update for Blogs section.");
+        return { html, changed: false };
+    }
+
+    const nextHtml = html.replace(blogsRegex, (_, start, _current, end) => `${start}${blogsContent}${end}`);
+
+    return { html: nextHtml, changed: nextHtml !== html };
+}
+
+/**
+ * Render the list items for the Overview section.
+ */
+function renderOverviewList(posts, ulIndent) {
+    if (!posts || posts.length === 0) {
+        return `\n${ulIndent}`;
+    }
+
+    const liIndent = `${ulIndent}    `;
+    const content = posts
+        .map((post) => {
+            const lines = [
+                `${liIndent}<li>`,
+                `${liIndent}    <a href="${escapeHtml(post.href)}">`,
+                `${liIndent}        - ${escapeHtml(post.title)}`,
+                `${liIndent}    </a>`,
+                `${liIndent}</li>`,
+            ];
+            return lines.join("\n");
+        })
+        .join("\n");
+
+    return `\n${content}\n${ulIndent}`;
+}
+
+/**
+ * Render the blog containers for the Blogs section.
+ */
+function renderBlogContainers(posts, baseIndent) {
+    if (!posts || posts.length === 0) {
+        return `\n${baseIndent}`;
+    }
+
+    const step = "    ";
+
+    const content = posts
+        .map((post) => {
+            const indent1 = `${baseIndent}${step}`;
+            const indent2 = `${indent1}${step}`;
+            const indent3 = `${indent2}${step}`;
+            const indent4 = `${indent3}${step}`;
+
+            const tagsLines = [`${indent2}<div class="tags">`];
+            if (post.tags && post.tags.length > 0) {
+                tagsLines.push(
+                    post.tags
+                        .map((tag) => {
+                            return [
+                                `${indent3}<div class="tag">`,
+                                `${indent4}${escapeHtml(tag)}`,
+                                `${indent3}</div>`,
+                            ].join("\n");
+                        })
+                        .join("\n")
+                );
+            }
+            tagsLines.push(`${indent2}</div>`);
+
+            return [
+                `${baseIndent}<div class="blog-container">`,
+                `${indent1}<div class="title">`,
+                `${indent2}<a href="${escapeHtml(post.href)}">${escapeHtml(post.title)} <span style="font-size: 14px; font-weight: 400; color: #999;">(click me)</span></a>`,
+                `${indent1}</div>`,
+                `${indent1}<div class="details">`,
+                `${indent2}<div class="date">`,
+                `${indent3}${escapeHtml(post.dateDisplay)}`,
+                `${indent2}</div>`,
+                ...tagsLines,
+                `${indent1}</div>`,
+                `${baseIndent}</div>`,
+            ].join("\n");
+        })
+        .join("\n\n");
+
+    return `\n${content}\n${baseIndent}`;
+}
+
+/**
+ * Locate indentation for a specific tag following a marker within HTML.
+ */
+function findIndentation(html, marker, tag) {
+    const markerIndex = html.indexOf(marker);
+    if (markerIndex === -1) {
+        return "";
+    }
+
+    const tagIndex = html.indexOf(tag, markerIndex);
+    if (tagIndex === -1) {
+        return "";
+    }
+
+    const lineStart = html.lastIndexOf("\n", tagIndex);
+    if (lineStart === -1) {
+        return "";
+    }
+
+    const line = html.slice(lineStart + 1, tagIndex);
+    return line;
+}
+
+/**
+ * Parse blog date strings in DD-MM-YYYY or YYYY-MM-DD format.
+ */
+function parsePostDate(value) {
+    const trimmed = String(value || "").trim();
+    if (!trimmed) {
+        return null;
+    }
+
+    const parts = trimmed.split("-").map((part) => part.trim());
+    if (parts.length !== 3) {
+        return null;
+    }
+
+    let day;
+    let month;
+    let year;
+
+    if (parts[0].length === 4) {
+        [year, month, day] = parts.map((part) => Number.parseInt(part, 10));
+    } else {
+        [day, month, year] = parts.map((part) => Number.parseInt(part, 10));
+    }
+
+    if (
+        Number.isNaN(day) ||
+        Number.isNaN(month) ||
+        Number.isNaN(year) ||
+        day <= 0 ||
+        month <= 0 ||
+        month > 12
+    ) {
+        return null;
+    }
+
+    const date = new Date(year, month - 1, day);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    date.setHours(0, 0, 0, 0);
+    return date;
+}
+
+function stripBlogTitleSuffix(title) {
+    if (!title) {
+        return "";
+    }
+
+    if (title.endsWith(BLOG_TITLE_SUFFIX)) {
+        return title.slice(0, -BLOG_TITLE_SUFFIX.length).trim();
+    }
+
+    return title;
+}
+
+function fallbackTitleFromPath(htmlPath) {
+    const fileName = path.basename(htmlPath, path.extname(htmlPath));
+    return fileName.replace(/[-_]+/g, " ").replace(/\s+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 buildPosts().catch((error) => {
