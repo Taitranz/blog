@@ -3,7 +3,11 @@ title: "Seek Music Post Mortem"
 date: "2025-11-09T23:03:17+10:00"
 description: "Seek Music: A Reflective Post-Mortem on Building a Concert Ticketing Platform"
 tags:
-  - CRUD
+  - Flask
+  - "Post Mortem"
+  - "Web Development"
+  - Learning
+
 ---
 
 ![Seek Music Preview](../../assets/images/seek_music_preview.png)

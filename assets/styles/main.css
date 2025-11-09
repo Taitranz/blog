@@ -204,6 +204,10 @@ body {
     padding: 220px 0 40px 0;
 }
 
+.section.blog > .content {
+    padding-top: 0;
+}
+
 .section.blog + .section.blog > .content {
     padding-top: 60px;
 }

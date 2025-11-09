@@ -20,28 +20,92 @@ const overlay = document.querySelector(".overlay");
 const navMenu = document.querySelector(".blog-nav");
 const hamburgerMenu = document.querySelector(".hamburger-menu-centered");
 
-function smoothScrollTo(element, duration) {
+const prefersReducedMotionQuery = window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion: reduce)")
+    : { matches: false };
+
+const scrollCancelEvents = [
+    { type: "wheel", options: { passive: true } },
+    { type: "touchstart", options: { passive: true } },
+    { type: "touchmove", options: { passive: true } },
+    { type: "keydown", options: false },
+    { type: "mousedown", options: false },
+];
+
+let scrollAnimationFrame = null;
+let cancelScrollListener = null;
+
+function addScrollCancelListeners(listener) {
+    scrollCancelEvents.forEach(({ type, options }) => window.addEventListener(type, listener, options));
+}
+
+function removeScrollCancelListeners(listener) {
+    scrollCancelEvents.forEach(({ type, options }) => window.removeEventListener(type, listener, options));
+}
+
+function stopActiveScrollAnimation() {
+    if (scrollAnimationFrame !== null) {
+        cancelAnimationFrame(scrollAnimationFrame);
+        scrollAnimationFrame = null;
+    }
+
+    if (cancelScrollListener) {
+        removeScrollCancelListeners(cancelScrollListener);
+        cancelScrollListener = null;
+    }
+}
+
+function smoothScrollTo(element, duration = 1000) {
+    if (!element) return;
+
+    stopActiveScrollAnimation();
+
     const targetPosition = element.getBoundingClientRect().top + window.scrollY;
+
+    if (prefersReducedMotionQuery.matches) {
+        window.scrollTo({ top: targetPosition, behavior: "auto" });
+        return;
+    }
+
     const startPosition = window.scrollY;
     const distance = targetPosition - startPosition;
+
+    if (Math.abs(distance) < 1) {
+        return;
+    }
+
+    const minDuration = 250;
+    const maxDuration = Math.max(duration, minDuration);
+    const distanceInfluence = Math.abs(distance) * 0.5;
+    const adjustedDuration = Math.min(maxDuration, Math.max(minDuration, distanceInfluence));
+
+    const easeInOutCubic = (progress) =>
+        progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
     let startTime = null;
 
-    function animation(currentTime) {
-        if (startTime === null) startTime = currentTime;
-        const timeElapsed = currentTime - startTime;
-        const run = ease(timeElapsed, startPosition, distance, duration);
-        window.scrollTo(0, run);
-        if (timeElapsed < duration) requestAnimationFrame(animation);
-    }
+    const step = (timestamp) => {
+        if (startTime === null) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / adjustedDuration, 1);
+        const easedProgress = easeInOutCubic(progress);
 
-    function ease(t, b, c, d) {
-        t /= d / 2;
-        if (t < 1) return (c / 2) * t * t + b;
-        t--;
-        return (-c / 2) * (t * (t - 2) - 1) + b;
-    }
+        window.scrollTo(0, startPosition + distance * easedProgress);
 
-    requestAnimationFrame(animation);
+        if (progress < 1) {
+            scrollAnimationFrame = requestAnimationFrame(step);
+        } else {
+            stopActiveScrollAnimation();
+        }
+    };
+
+    cancelScrollListener = () => {
+        stopActiveScrollAnimation();
+    };
+
+    addScrollCancelListeners(cancelScrollListener);
+
+    scrollAnimationFrame = requestAnimationFrame(step);
 }
 
 function closeMenu() {
@@ -77,31 +141,91 @@ if (overlay) {
     overlay.addEventListener("click", closeMenu);
 }
 
-if (headings.length > 0) {
-    const observerOptions = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.3,
+// Find the TOC item that targets the post-top element
+const postTopItem = tocItems.find((item) => item.dataset.target === "post-top");
+
+if (headings.length > 0 || postTopItem) {
+    const updateSelectedItem = () => {
+        // If at the top of the page, select the post-top item
+        if (window.scrollY < 100 && postTopItem) {
+            tocItems.forEach((item) => item.classList.remove("selected"));
+            postTopItem.classList.add("selected");
+            return;
+        }
+
+        // Find the heading that's currently closest to the top of the viewport
+        if (headings.length > 0) {
+            let selectedHeading = null;
+            let minTop = Infinity;
+
+            // Check all headings to find the one closest to the top
+            headings.forEach(({ heading }) => {
+                const rect = heading.getBoundingClientRect();
+                const top = rect.top;
+                
+                // Consider headings that are above or just below the top threshold
+                // We want to select the heading that has passed the top of the viewport
+                if (top <= 150 && top >= -100) {
+                    // Prefer headings that are closer to the top (but have scrolled past)
+                    if (top < minTop) {
+                        minTop = top;
+                        selectedHeading = heading;
+                    }
+                }
+            });
+
+            // If we found a heading, select it
+            if (selectedHeading) {
+                const mapping = headings.find(({ heading }) => heading === selectedHeading);
+                if (mapping) {
+                    tocItems.forEach((item) => item.classList.remove("selected"));
+                    mapping.item.classList.add("selected");
+                    return;
+                }
+            }
+
+            // Fallback: if no heading is in the threshold, find the last one that passed
+            let lastPassedHeading = null;
+            headings.forEach(({ heading }) => {
+                const rect = heading.getBoundingClientRect();
+                if (rect.top < 0) {
+                    // This heading has scrolled past the top
+                    if (!lastPassedHeading || heading.offsetTop > lastPassedHeading.offsetTop) {
+                        lastPassedHeading = heading;
+                    }
+                }
+            });
+
+            if (lastPassedHeading) {
+                const mapping = headings.find(({ heading }) => heading === lastPassedHeading);
+                if (mapping) {
+                    tocItems.forEach((item) => item.classList.remove("selected"));
+                    mapping.item.classList.add("selected");
+                }
+            }
+        }
     };
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            const mapping = headings.find(({ heading }) => heading === entry.target);
-            if (!mapping) {
-                return;
-            }
-
-            if (entry.isIntersecting) {
-                tocItems.forEach((item) => item.classList.remove("selected"));
-                mapping.item.classList.add("selected");
-            }
-        });
-    }, observerOptions);
-
-    headings.forEach(({ heading }) => observer.observe(heading));
-
     // Set the first item as selected by default.
-    headings[0].item.classList.add("selected");
+    if (postTopItem) {
+        postTopItem.classList.add("selected");
+    } else if (headings[0]) {
+        headings[0].item.classList.add("selected");
+    }
+
+    // Update selection on scroll
+    let scrollTimeout = null;
+    window.addEventListener("scroll", () => {
+        if (scrollTimeout) {
+            cancelAnimationFrame(scrollTimeout);
+        }
+        scrollTimeout = requestAnimationFrame(() => {
+            updateSelectedItem();
+        });
+    }, { passive: true });
+
+    // Initial check
+    updateSelectedItem();
 }
 
 // Deactivate hamburger menu on window resize
