@@ -223,7 +223,7 @@ body {
 .blog-container {
     background: #ffffff;
     border-radius: 8px;
-    padding: 40px;
+
 }
 
 .blog-container .title {
@@ -323,7 +323,7 @@ body {
 
 .blog-container .overview pre.has-copy {
     position: relative;
-    padding-top: 44px;
+    padding-top: 28px;
 }
 
 .copy-code-btn {
@@ -408,10 +408,12 @@ body {
     user-select: none;
 }
 
-.section.overview>.content,
-.section.latest>.content,
-.section.past>.content {
+.section.overview>.content {
     padding: 220px 0 40px 0;
+}
+
+.section.blogs>.content {
+    padding: 220px 0 560px 0;
 }
 
 .section.overview h2,
@@ -428,6 +430,60 @@ body {
     color: #333;
     font-weight: 400;
     margin-bottom: 40px;
+}
+
+.section.overview .overview-toc {
+    margin-top: 32px;
+    background: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section.overview .overview-toc h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+}
+
+.section.overview .overview-toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.section.overview .overview-toc li a {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a1a;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.2s ease;
+}
+
+.section.overview .overview-toc li a::after {
+    content: "\2192";
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.section.overview .overview-toc li a:hover,
+.section.overview .overview-toc li a:focus {
+    color: #666666;
+}
+
+.section.overview .overview-toc li a:hover::after,
+.section.overview .overview-toc li a:focus::after {
+    transform: translateX(4px);
 }
 
 main {

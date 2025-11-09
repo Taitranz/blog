@@ -51,8 +51,7 @@
     <nav class="blog-nav">
         <div class="item intro" aria-label="Navigate to intro section">Intro</div>
         <div class="item overview" aria-label="Navigate to overview section">Overview</div>
-        <div class="item latest" aria-label="Navigate to latest section">Latest</div>
-        <div class="item past" aria-label="Navigate to past section">Past</div>
+        <div class="item blogs" aria-label="Navigate to blogs section">Blogs</div>
     </nav>
     <div class="overlay"></div>
     <main class="blog-main">
@@ -70,17 +69,27 @@
         <section class="section overview">
             <div class="content">
                 <h2>Overview</h2>
-                <p>
-                    I write about technical implementations, architectural decisions, and lessons learned from building 
-                    complex software systems. My posts cover topics ranging from GPU-accelerated computing and real-time 
-                    data processing to software architecture patterns and performance optimization.
-                </p>
+                <div class="overview-toc">
+                    <h3>Table of Contents</h3>
+                    <ul>
+                        <li>
+                            <a href="posts/valgo-technical-documentation.html">
+                                - Valgo: Advanced Financial Trading Platform
+                            </a>
+                        </li>
+                        <li>
+                            <a href="posts/valgo-project-updates.html">
+                                -Valgo project updates
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
 
-        <section class="section latest">
+        <section class="section blogs">
             <div class="content">
-                <h2>Latest</h2>
+                <h2>Blogs</h2>
                 <div class="blog-container">
                     <div class="title">
                         <a href="posts/valgo-technical-documentation.html">Valgo: Advanced Financial Trading Platform <span style="font-size: 14px; font-weight: 400; color: #999;">(click me)</span></a>
@@ -102,12 +111,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="section past">
-            <div class="content">
-                <h2>Past</h2>
                 <div class="blog-container">
                     <div class="title">
                         <a href="posts/valgo-project-updates.html">Valgo project updates <span style="font-size: 14px; font-weight: 400; color: #999;">(click me)</span></a>
