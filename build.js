@@ -173,7 +173,7 @@ function renderMarkdownWithToc(markdown, description) {
         if (depth === 2) {
             headings.push({
                 level: depth,
-                text: stripHtml(renderedText),
+                text: decodeHtmlEntities(stripHtml(renderedText)),
                 slug,
             });
         }
@@ -394,6 +394,20 @@ function buildDescriptionTocItem(description) {
  */
 function stripHtml(value) {
     return String(value || "").replace(/<[^>]*>/g, "");
+}
+
+/**
+ * Decode HTML entities to their actual characters.
+ */
+function decodeHtmlEntities(value) {
+    return String(value || "")
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/g, "'")
+        .replace(/&#x2F;/g, "/");
 }
 
 /**
@@ -765,13 +779,44 @@ function parsePostDate(value) {
         return null;
     }
 
-    // Try ISO date format first (e.g., "2025-11-10T12:00:00+10:00")
+    // Check if it's DD-MM-YYYY format (with optional time)
+    // Format: "DD-MM-YYYY" or "DD-MM-YYYY HH:mm:ss"
+    const ddMmYyyyPattern = /^(\d{1,2})-(\d{1,2})-(\d{4})(?:\s+(\d{1,2}):(\d{1,2}):(\d{1,2}))?$/;
+    const ddMmMatch = trimmed.match(ddMmYyyyPattern);
+    if (ddMmMatch) {
+        const day = Number.parseInt(ddMmMatch[1], 10);
+        const month = Number.parseInt(ddMmMatch[2], 10);
+        const year = Number.parseInt(ddMmMatch[3], 10);
+        const hour = ddMmMatch[4] ? Number.parseInt(ddMmMatch[4], 10) : 0;
+        const minute = ddMmMatch[5] ? Number.parseInt(ddMmMatch[5], 10) : 0;
+        const second = ddMmMatch[6] ? Number.parseInt(ddMmMatch[6], 10) : 0;
+
+        if (
+            Number.isNaN(day) ||
+            Number.isNaN(month) ||
+            Number.isNaN(year) ||
+            day <= 0 ||
+            month <= 0 ||
+            month > 12
+        ) {
+            return null;
+        }
+
+        const date = new Date(year, month - 1, day, hour, minute, second);
+        if (Number.isNaN(date.getTime())) {
+            return null;
+        }
+
+        return date;
+    }
+
+    // Try ISO date format (e.g., "2025-11-10T12:00:00+10:00")
     const isoDate = new Date(trimmed);
     if (!Number.isNaN(isoDate.getTime())) {
         return isoDate;
     }
 
-    // Fall back to DD-MM-YYYY or YYYY-MM-DD format
+    // Fall back to YYYY-MM-DD format (without time)
     const parts = trimmed.split("-").map((part) => part.trim());
     if (parts.length !== 3) {
         return null;
@@ -784,6 +829,7 @@ function parsePostDate(value) {
     if (parts[0].length === 4) {
         [year, month, day] = parts.map((part) => Number.parseInt(part, 10));
     } else {
+        // This shouldn't happen if DD-MM-YYYY was already matched above
         [day, month, year] = parts.map((part) => Number.parseInt(part, 10));
     }
 

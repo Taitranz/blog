@@ -1,6 +1,6 @@
 ---
 title: "Seek Music Post Mortem"
-date: "2025-11-09T23:03:17+10:00"
+date: "09-11-2025 23:03:17"
 description: "Seek Music: A Reflective Post-Mortem on Building a Concert Ticketing Platform"
 tags:
   - Flask

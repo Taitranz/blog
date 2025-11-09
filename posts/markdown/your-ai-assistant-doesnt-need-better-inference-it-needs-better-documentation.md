@@ -1,6 +1,6 @@
 ---
 title: "Your AI Assistant Doesn't Need Better Inference. It Needs Better Documentation"
-date: "2025-11-10T12:00:00+10:00"
+date: "10-11-2025 12:00:00"
 description: "Your AI Assistant Doesn't Need Better Inference. It Needs Better Documentation"
 tags:
   - "AI Development"

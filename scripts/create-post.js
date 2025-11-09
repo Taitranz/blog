@@ -170,20 +170,14 @@ function escapeYaml(value) {
 
 function defaultDateTime() {
     const now = new Date();
-    const year = String(now.getFullYear());
-    const month = String(now.getMonth() + 1).padStart(2, "0");
     const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const year = String(now.getFullYear());
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
     const seconds = String(now.getSeconds()).padStart(2, "0");
 
-    const offsetMinutes = -now.getTimezoneOffset();
-    const sign = offsetMinutes >= 0 ? "+" : "-";
-    const absMinutes = Math.abs(offsetMinutes);
-    const offsetHours = String(Math.floor(absMinutes / 60)).padStart(2, "0");
-    const offsetRemainingMinutes = String(absMinutes % 60).padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetRemainingMinutes}`;
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 }
 
 function slugify(value) {

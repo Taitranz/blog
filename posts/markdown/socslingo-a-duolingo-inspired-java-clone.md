@@ -1,6 +1,6 @@
 ---
 title: "Socslingo: A Duolingo-Inspired Java Clone Post-Mortem"
-date: "2025-11-10T00:09:39+10:00"
+date: "10-11-2025 00:09:39"
 description: "Socslingo: A Duolingo-Inspired Java Clone Post-Mortem"
 tags:
   - Java
