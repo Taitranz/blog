@@ -228,12 +228,27 @@ body {
 
 }
 
+.blog-banner {
+    margin-bottom: 32px;
+    overflow: hidden;
+    background: #f5f5f5;
+    height: 440px;
+}
+
+.blog-banner img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .blog-container .title {
     font-size: 60px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 16px;
     line-height: 1.1;
+    letter-spacing: -0.04em;
 }
 
 .blog-container .title a {
@@ -241,6 +256,7 @@ body {
     text-decoration: none;
     cursor: pointer;
     transition: color 0.2s ease;
+    letter-spacing: -4px;
 }
 
 .blog-container .title a:hover {
@@ -322,7 +338,8 @@ body {
 
 .blog-container .overview code {
     font-family: "Courier New", Courier, monospace;
-    background: #f6f8fb;
+    background: #f6f7fa;
+    border: 1px solid #d5d9e0;
     color: #1a1a1a;
     padding: 2px 6px;
     border-radius: 4px;

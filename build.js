@@ -49,7 +49,8 @@ async function buildPosts() {
         const urlFromFrontmatter = typeof data.url === "string" ? data.url.trim() : "";
         const canonicalUrl = urlFromFrontmatter || `${ROOT_URL}/posts/${slug}.html`;
 
-        const { html: htmlContent, tocHtml } = renderMarkdownWithToc(content);
+        const { html: htmlContent, tocHtml } = renderMarkdownWithToc(content, data.description);
+        const { bannerHtml, contentHtml } = extractBannerImage(htmlContent);
 
         const rendered = fillTemplate(template, {
             title: escapeHtml(data.title),
@@ -59,7 +60,8 @@ async function buildPosts() {
             date: escapeHtml(data.date || ""),
             tags: buildTagsHtml(data.tags),
             toc: tocHtml,
-            content: htmlContent,
+            banner: bannerHtml,
+            content: contentHtml,
         });
 
         const outputPath = path.join(OUTPUT_DIR, `${slug}.html`);
@@ -152,7 +154,7 @@ function buildTagsHtml(tags) {
 /**
  * Render markdown to HTML while generating a table of contents.
  */
-function renderMarkdownWithToc(markdown) {
+function renderMarkdownWithToc(markdown, description) {
     const headings = [];
     const renderer = new marked.Renderer();
     const slugCounts = new Map();
@@ -175,18 +177,85 @@ function renderMarkdownWithToc(markdown) {
     };
 
     const html = marked.parse(markdown, { renderer });
-    const tocHtml = buildTocHtml(headings);
+    const tocHtml = buildTocHtml(headings, description);
 
     return { html, tocHtml };
 }
 
 /**
+ * Extract a leading banner image from the rendered HTML (if present).
+ */
+function extractBannerImage(html) {
+    if (typeof html !== "string" || html.trim() === "") {
+        return { bannerHtml: "", contentHtml: html || "" };
+    }
+
+    const $ = cheerio.load(html, { decodeEntities: false }, false);
+    const container = $("body").length ? $("body") : $.root();
+    const meaningfulNodes = container
+        .contents()
+        .filter((_, node) => {
+            if (node.type === "text") {
+                return Boolean((node.data || "").trim());
+            }
+            return node.type === "tag";
+        });
+
+    if (meaningfulNodes.length === 0) {
+        return { bannerHtml: "", contentHtml: html };
+    }
+
+    const firstNode = meaningfulNodes.first();
+    let bannerHtml = "";
+
+    const firstElement = firstNode[0];
+
+    if (firstElement?.type === "tag") {
+        if (firstElement.name === "img") {
+            const imgHtml = $.html(firstNode);
+            if (imgHtml) {
+                bannerHtml = wrapBannerHtml(imgHtml);
+                firstNode.remove();
+            }
+        } else if (firstElement.name === "p") {
+            const meaningfulChildren = firstNode
+                .contents()
+                .filter((_, node) => {
+                    if (node.type === "text") {
+                        return Boolean((node.data || "").trim());
+                    }
+                    return node.type === "tag";
+                });
+
+            const firstChild = meaningfulChildren.first();
+
+            if (meaningfulChildren.length === 1 && firstChild[0]?.name === "img") {
+                const imgHtml = $.html(firstChild);
+                if (imgHtml) {
+                    bannerHtml = wrapBannerHtml(imgHtml);
+                    firstNode.remove();
+                }
+            }
+        }
+    }
+
+    if (!bannerHtml) {
+        return { bannerHtml: "", contentHtml: html };
+    }
+
+    const contentHtml = (container.html() || "").trim();
+    return { bannerHtml, contentHtml };
+}
+
+function wrapBannerHtml(imgHtml) {
+    return `<div class="blog-banner">\n                        ${imgHtml}\n                    </div>`;
+}
+
+/**
  * Build TOC markup from heading data.
  */
-function buildTocHtml(headings) {
-    if (headings.length === 0) {
-        return "        <div class=\"item toc-empty\">No sections available</div>";
-    }
+function buildTocHtml(headings, description) {
+    const descriptionItem = buildDescriptionTocItem(description);
 
     const root = { level: 1, children: [] };
     const stack = [root];
@@ -204,7 +273,22 @@ function buildTocHtml(headings) {
     });
 
     const rendered = renderTocNodes(root.children, 0);
-    return rendered ? `        <div class="toc-items">\n${rendered}\n        </div>` : "";
+
+    if (!rendered && !descriptionItem) {
+        return "";
+    }
+
+    const items = [];
+
+    if (descriptionItem) {
+        items.push(descriptionItem);
+    }
+
+    if (rendered) {
+        items.push(rendered);
+    }
+
+    return `        <div class="toc-items">\n${items.join("\n")}\n        </div>`;
 }
 
 function renderTocNodes(nodes, depth) {
@@ -230,6 +314,11 @@ function renderTocNodes(nodes, depth) {
             return html;
         })
         .join("\n");
+}
+
+function buildDescriptionTocItem(description) {
+    const label = escapeHtml(description || "Description");
+    return `            <div class="item toc-item level-description" data-target="post-top">\n                <a href="#post-top">${label}</a>\n            </div>`;
 }
 
 /**
@@ -480,7 +569,7 @@ function renderBlogContainers(posts, baseIndent) {
             return [
                 `${baseIndent}<div class="blog-container">`,
                 `${indent1}<div class="title">`,
-                `${indent2}<a href="${escapeHtml(post.href)}">${escapeHtml(post.title)} <span style="font-size: 14px; font-weight: 400; color: #999;">(click me)</span></a>`,
+                `${indent2}<a href="${escapeHtml(post.href)}">${escapeHtml(post.title)} <span style="font-size: 14px; font-weight: 400; color: #999; letter-spacing: -0.3px;">(click me)</span></a>`,
                 `${indent1}</div>`,
                 `${indent1}<div class="details">`,
                 `${indent2}<div class="date">`,
