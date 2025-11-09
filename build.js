@@ -158,7 +158,7 @@ function renderMarkdownWithToc(markdown) {
         slugCounts.set(baseSlug, count + 1);
         const slug = count === 0 ? baseSlug : `${baseSlug}-${count}`;
 
-        if (depth === 2 || depth === 3) {
+        if (depth >= 2 && depth <= 6) {
             headings.push({
                 level: depth,
                 text: stripHtml(renderedText),
@@ -182,10 +182,46 @@ function buildTocHtml(headings) {
         return "        <div class=\"item toc-empty\">No sections available</div>";
     }
 
-    return headings
-        .map(({ level, text, slug }) => {
-            const levelClass = level === 3 ? " level-3" : " level-2";
-            return `        <div class="item toc-item${levelClass}" data-target="${slug}">\n            <a href="#${slug}">${escapeHtml(text)}</a>\n        </div>`;
+    const root = { level: 1, children: [] };
+    const stack = [root];
+
+    headings.forEach((heading) => {
+        const level = Math.min(Math.max(heading.level, 2), 6);
+
+        while (stack.length > 1 && stack[stack.length - 1].level >= level) {
+            stack.pop();
+        }
+
+        const node = { ...heading, level, children: [] };
+        stack[stack.length - 1].children.push(node);
+        stack.push(node);
+    });
+
+    const rendered = renderTocNodes(root.children, 0);
+    return rendered ? `        <div class="toc-items">\n${rendered}\n        </div>` : "";
+}
+
+function renderTocNodes(nodes, depth) {
+    if (!nodes || nodes.length === 0) {
+        return "";
+    }
+
+    const indent = "        " + "    ".repeat(depth);
+    const childIndent = "        " + "    ".repeat(depth + 1);
+
+    return nodes
+        .map((node) => {
+            const nodeClass = ` level-${node.level}`;
+            let html = `${indent}<div class="item toc-item${nodeClass}" data-target="${node.slug}">\n`;
+            html += `${indent}    <a href="#${node.slug}">${escapeHtml(node.text)}</a>\n`;
+            html += `${indent}</div>`;
+
+            if (node.children && node.children.length > 0) {
+                const childrenHtml = renderTocNodes(node.children, depth + 1);
+                html += `\n${childIndent}<div class="toc-children">\n${childrenHtml}\n${childIndent}</div>`;
+            }
+
+            return html;
         })
         .join("\n");
 }
