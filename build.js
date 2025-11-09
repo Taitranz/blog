@@ -48,7 +48,7 @@ async function buildPosts() {
 
         const slug = data.slug || file.replace(/\.md$/i, "");
         const urlFromFrontmatter = typeof data.url === "string" ? data.url.trim() : "";
-        const canonicalUrl = urlFromFrontmatter || `${ROOT_URL}/posts/${slug}.html`;
+        const canonicalUrl = urlFromFrontmatter || `${ROOT_URL}/posts/${slug}`;
 
         const { html: htmlContent, tocHtml } = renderMarkdownWithToc(content, data.description);
         const { bannerHtml, contentHtml } = extractBannerImage(htmlContent);
@@ -65,7 +65,9 @@ async function buildPosts() {
             content: contentHtml,
         });
 
-        const outputPath = path.join(OUTPUT_DIR, `${slug}.html`);
+        const postDir = path.join(OUTPUT_DIR, slug);
+        await fs.ensureDir(postDir);
+        const outputPath = path.join(postDir, "index.html");
         const minified = minifyHtml(rendered);
         await fs.writeFile(outputPath, minified, "utf8");
 
@@ -478,12 +480,12 @@ function escapeHtml(value) {
 /**
  * Extract relevant metadata from a rendered blog HTML file.
  */
-async function extractPostMetadata(htmlPath) {
+async function extractPostMetadata(htmlPath, slug) {
     const html = await fs.readFile(htmlPath, "utf8");
     const $ = cheerio.load(html, { decodeEntities: false });
 
     const rawTitle = $("head > title").first().text().trim();
-    const title = stripBlogTitleSuffix(rawTitle) || fallbackTitleFromPath(htmlPath);
+    const title = stripBlogTitleSuffix(rawTitle) || fallbackTitleFromPath(slug || htmlPath);
 
     const dateText = $(".blog-container .details .date").first().text().trim();
     const dateValue = parsePostDate(dateText);
@@ -513,11 +515,12 @@ async function extractPostMetadata(htmlPath) {
         }
     }
 
-    const fileName = path.basename(htmlPath);
+    // Use slug (directory name) for href, or fallback to directory name from path
+    const postSlug = slug || path.basename(path.dirname(htmlPath));
 
     return {
-        fileName,
-        href: `posts/${fileName}`,
+        fileName: `${postSlug}/index.html`,
+        href: `posts/${postSlug}`,
         title,
         dateDisplay: dateText,
         dateValue,
@@ -537,21 +540,27 @@ async function scanAllPosts() {
     }
 
     const entries = await fs.readdir(OUTPUT_DIR);
-    const htmlFiles = entries.filter(
-        (file) => file.toLowerCase().endsWith(".html") && file.toLowerCase() !== "template.html"
-    );
-
     const posts = [];
 
-    for (const file of htmlFiles) {
-        const htmlPath = path.join(OUTPUT_DIR, file);
-        try {
-            const metadata = await extractPostMetadata(htmlPath);
-            if (metadata) {
-                posts.push(metadata);
+    for (const entry of entries) {
+        const entryPath = path.join(OUTPUT_DIR, entry);
+        const stat = await fs.stat(entryPath);
+        
+        // Look for directories with index.html files
+        if (stat.isDirectory()) {
+            const indexPath = path.join(entryPath, "index.html");
+            const indexExists = await fs.pathExists(indexPath);
+            
+            if (indexExists) {
+                try {
+                    const metadata = await extractPostMetadata(indexPath, entry);
+                    if (metadata) {
+                        posts.push(metadata);
+                    }
+                } catch (error) {
+                    console.warn(`Skipping ${path.relative(__dirname, indexPath)}: ${error.message}`);
+                }
             }
-        } catch (error) {
-            console.warn(`Skipping ${path.relative(__dirname, htmlPath)}: ${error.message}`);
         }
     }
 
@@ -810,8 +819,15 @@ function stripBlogTitleSuffix(title) {
     return title;
 }
 
-function fallbackTitleFromPath(htmlPath) {
-    const fileName = path.basename(htmlPath, path.extname(htmlPath));
+function fallbackTitleFromPath(htmlPathOrSlug) {
+    // If it's a slug (string without path separators), use it directly
+    if (typeof htmlPathOrSlug === "string" && !htmlPathOrSlug.includes(path.sep) && !htmlPathOrSlug.includes("/")) {
+        const slug = htmlPathOrSlug;
+        return slug.replace(/[-_]+/g, " ").replace(/\s+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+    
+    // Otherwise, extract from file path
+    const fileName = path.basename(htmlPathOrSlug, path.extname(htmlPathOrSlug));
     return fileName.replace(/[-_]+/g, " ").replace(/\s+/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
