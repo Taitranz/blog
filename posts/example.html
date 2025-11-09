@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Markdown Post — Tai Tran Blog</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="Demonstration post showing the markdown to HTML build pipeline.">
+    <meta name="keywords" content="Demo, Markdown, Automation">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://blog.taitranz.com/posts/example.html">
+    <meta property="og:site_name" content="Tai Tran Blog">
+    <meta property="og:title" content="Sample Markdown Post — Tai Tran Blog">
+    <meta property="og:description" content="Demonstration post showing the markdown to HTML build pipeline.">
+
+    <link rel="icon" href="../assets/favicon_io/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="../assets/favicon_io/site.webmanifest">
+
+    <link rel="canonical" href="https://blog.taitranz.com/posts/example.html">
+
+    <link rel="stylesheet" href="../assets/styles/fonts.css">
+    <link rel="stylesheet" href="../assets/styles/variables.css">
+    <link rel="stylesheet" href="../assets/styles/media-queries.css">
+    <link rel="stylesheet" href="../assets/styles/main.css">
+</head>
+
+<body>
+    <header class="blog-header">
+        <div class="content">
+            <h1>
+                <a href="../index.html" style="color: inherit; text-decoration: none;">Tai Tran</a>
+            </h1>
+            <div class="hamburger-menu-centered" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+    <nav class="blog-nav">
+        <div class="item toc-heading">Table of Contents</div>
+        <div class="toc-items">
+        <div class="item toc-item level-2" data-target="frontmatter-metadata">
+            <a href="#frontmatter-metadata">Frontmatter Metadata</a>
+        </div>
+            <div class="toc-children">
+            <div class="item toc-item level-3" data-target="metadata-fields">
+                <a href="#metadata-fields">Metadata Fields</a>
+            </div>
+                <div class="toc-children">
+                <div class="item toc-item level-4" data-target="title">
+                    <a href="#title">Title</a>
+                </div>
+                <div class="item toc-item level-4" data-target="description">
+                    <a href="#description">Description</a>
+                </div>
+                </div>
+            </div>
+        <div class="item toc-item level-2" data-target="formatting-content">
+            <a href="#formatting-content">Formatting Content</a>
+        </div>
+            <div class="toc-children">
+            <div class="item toc-item level-3" data-target="publishing-workflow">
+                <a href="#publishing-workflow">Publishing Workflow</a>
+            </div>
+                <div class="toc-children">
+                <div class="item toc-item level-4" data-target="local-build">
+                    <a href="#local-build">Local Build</a>
+                </div>
+                <div class="item toc-item level-4" data-target="pre-commit-hook">
+                    <a href="#pre-commit-hook">Pre-commit Hook</a>
+                </div>
+                    <div class="toc-children">
+                    <div class="item toc-item level-5" data-target="extra-checks">
+                        <a href="#extra-checks">Extra Checks</a>
+                    </div>
+                    </div>
+                </div>
+            <div class="item toc-item level-3" data-target="inline-code-blocks">
+                <a href="#inline-code-blocks">Inline Code Blocks</a>
+            </div>
+            </div>
+        </div>
+    </nav>
+    <div class="overlay"></div>
+    <main class="blog-main">
+        <section class="section blog">
+            <div class="content">
+                <div class="blog-container">
+                    <div class="title">
+                        Sample Markdown Post
+                    </div>
+                    <div class="details">
+                        <div class="date">
+                            2025-11-09
+                        </div>
+                        <div class="tags">
+                                                        <div class="tag">
+                                Demo
+                            </div>
+                            <div class="tag">
+                                Markdown
+                            </div>
+                            <div class="tag">
+                                Automation
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overview">
+                        <h1 id="building-posts-with-markdown">Building Posts with Markdown</h1>
+<p>Writing posts in markdown keeps the authoring experience fast and flexible.2</p>
+<h2 id="frontmatter-metadata">Frontmatter Metadata</h2>
+<p>Every post includes metadata in YAML frontmatter at the top of the file. The build script uses this information for HTML <code>&lt;meta&gt;</code> tags and the on-page header.</p>
+<ul>
+<li><code>title</code> controls the page title and heading.</li>
+<li><code>date</code> displays under the post title.</li>
+<li><code>description</code> feeds both SEO metadata and previews.</li>
+<li><code>tags</code> populate the pill elements below the date.</li>
+</ul>
+<h3 id="metadata-fields">Metadata Fields</h3>
+<p>Dig a little deeper into what each field is doing for the final HTML output.</p>
+<h4 id="title">Title</h4>
+<p>Controls both the on-page <code>&lt;h1&gt;</code> and the <code>&lt;title&gt;</code> tag that appears in the browser.</p>
+<h4 id="description">Description</h4>
+<p>Populates meta descriptions for search and the Open Graph preview shown on social platforms.</p>
+<h2 id="formatting-content">Formatting Content</h2>
+<p>You can use standard markdown syntax for headings, lists, code blocks, and more:</p>
+<pre><code class="language-js">function hello(name) {
+  return `Hello, ${name}!`;
+}
+</code></pre>
+<blockquote>
+<p>Tip: Markdown lets you focus on writing, while the build step handles styling and layout.</p>
+</blockquote>
+<h3 id="publishing-workflow">Publishing Workflow</h3>
+<p>Once you&#39;re happy with the content, the rest of the workflow is automated.</p>
+<h4 id="local-build">Local Build</h4>
+<p>Run <code>npm run build</code> to confirm the output matches expectations before committing.</p>
+<h4 id="pre-commit-hook">Pre-commit Hook</h4>
+<p>The Husky hook regenerates HTML from markdown on every commit.</p>
+<h5 id="extra-checks">Extra Checks</h5>
+<p>Add linting or screenshot tests here if you want to enforce additional quality gates.</p>
+<h3 id="inline-code-blocks">Inline Code Blocks</h3>
+<p>Need to drop a quick shell command? Wrap it with triple backticks on one line like this:</p>
+<pre><code>npm run build
+</code></pre>
+<p>The generator will format it as a fenced code block automatically.</p>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="../assets/scripts/blog-post.js"></script>
+</body>
+
+</html>

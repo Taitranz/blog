@@ -147,6 +147,7 @@ function buildTagsHtml(tags) {
  * Render markdown to HTML while generating a table of contents.
  */
 function renderMarkdownWithToc(markdown) {
+    const normalizedMarkdown = normalizeInlineCodeBlocks(markdown);
     const headings = [];
     const renderer = new marked.Renderer();
     const slugCounts = new Map();
@@ -168,7 +169,7 @@ function renderMarkdownWithToc(markdown) {
         return `<h${depth} id="${slug}">${renderedText}</h${depth}>\n`;
     };
 
-    const html = marked.parse(markdown, { renderer });
+    const html = marked.parse(normalizedMarkdown, { renderer });
     const tocHtml = buildTocHtml(headings);
 
     return { html, tocHtml };
@@ -245,6 +246,17 @@ function slugify(value) {
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-")
         .replace(/^-|-$/g, "") || "section";
+}
+
+/**
+ * Convert inline triple-backtick code spans into fenced blocks.
+ */
+function normalizeInlineCodeBlocks(source) {
+    return source.replace(/(^|\s)```([^`\n]+?)```(?=\s|$)/g, (match, leading, code) => {
+        const trimmedCode = code.trim();
+        const prefix = leading.endsWith("\n") ? leading : `${leading}\n`;
+        return `${prefix}\`\`\`\n${trimmedCode}\n\`\`\`\n`;
+    });
 }
 
 /**
