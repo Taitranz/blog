@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://blog.taitranz.com</loc>
+        <lastmod>2025-11-14T23:43:31.104Z</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://blog.taitranz.com/posts/nov11-valgo-progress-update</loc>
+        <lastmod>2025-11-09T16:23:12.865Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://blog.taitranz.com/posts/seek-music-post-mortem</loc>
+        <lastmod>2025-11-09T16:22:19.539Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://blog.taitranz.com/posts/socslingo-a-duolingo-inspired-java-clone</loc>
+        <lastmod>2025-11-09T16:21:38.973Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://blog.taitranz.com/posts/your-ai-assistant-doesnt-need-better-inference-it-needs-better-documentation</loc>
+        <lastmod>2025-11-09T16:22:19.539Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+</urlset>

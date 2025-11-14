@@ -24,7 +24,7 @@ Allow: /
 # Crawl-delay: 1
 
 # Sitemap location (uncomment and update if you have a sitemap)
-# Sitemap: https://blog.taitranz.com/sitemap.xml
+Sitemap: https://blog.taitranz.com/sitemap.xml
 
 # Specific rules for major search engines
 User-agent: Googlebot

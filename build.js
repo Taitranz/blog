@@ -6,6 +6,12 @@ const cheerio = require("cheerio");
 const hljs = require("highlight.js");
 
 const ROOT_URL = "https://blog.taitranz.com";
+const AUTHOR_NAME = "Tai Tran";
+const AUTHOR_URL = "https://taitranz.com/";
+const DEFAULT_OG_IMAGE = `${ROOT_URL}/assets/favicon_io/android-chrome-512x512.png`;
+const PUBLISHER_NAME = "Tai Tran Blog";
+const PUBLISHER_LOGO = `${ROOT_URL}/assets/favicon_io/android-chrome-512x512.png`;
+const SITEMAP_PATH = path.join(__dirname, "sitemap.xml");
 const SOURCE_DIR = path.join(__dirname, "posts", "markdown");
 const OUTPUT_DIR = path.join(__dirname, "posts");
 const TEMPLATE_PATH = path.join(__dirname, "posts", "template.html");
@@ -35,8 +41,11 @@ async function buildPosts() {
 
     await fs.ensureDir(OUTPUT_DIR);
 
+    const postsMetadata = [];
+
     for (const file of files) {
         const markdownPath = path.join(SOURCE_DIR, file);
+        const markdownStat = await fs.stat(markdownPath);
         const { data, content } = matter(await fs.readFile(markdownPath, "utf8"));
 
         try {
@@ -51,7 +60,25 @@ async function buildPosts() {
         const canonicalUrl = urlFromFrontmatter || `${ROOT_URL}/posts/${slug}`;
 
         const { html: htmlContent, tocHtml } = renderMarkdownWithToc(content, data.description);
-        const { bannerHtml, contentHtml } = extractBannerImage(htmlContent);
+        const { bannerHtml, contentHtml, bannerImage } = extractBannerImage(htmlContent);
+        const publishedDate = parsePostDate(data.date);
+        const dateISO = publishedDate ? publishedDate.toISOString() : "";
+        const modifiedDate =
+            markdownStat?.mtime instanceof Date
+                ? markdownStat.mtime
+                : publishedDate || null;
+        const modifiedISO = modifiedDate ? modifiedDate.toISOString() : dateISO;
+        const datePublishedISO = dateISO || modifiedISO || "";
+        const dateModifiedISO = modifiedISO || dateISO || "";
+        const ogImage = buildOgImageUrl(bannerImage?.src);
+        const structuredData = generateStructuredData({
+            title: data.title,
+            description: data.description || "",
+            url: canonicalUrl,
+            datePublished: datePublishedISO,
+            dateModified: dateModifiedISO,
+            image: ogImage,
+        });
 
         const rendered = fillTemplate(template, {
             title: escapeHtml(data.title),
@@ -59,10 +86,15 @@ async function buildPosts() {
             keywords: buildKeywords(data),
             url: canonicalUrl,
             date: escapeHtml(data.date || ""),
+            dateISO: escapeHtml(datePublishedISO),
+            modifiedISO: escapeHtml(dateModifiedISO),
+            author: escapeHtml(AUTHOR_NAME),
+            image: escapeHtml(ogImage),
             tags: buildTagsHtml(data.tags),
             toc: tocHtml,
             banner: bannerHtml,
             content: contentHtml,
+            structuredData: structuredData ? `    ${structuredData}` : "",
         });
 
         const postDir = path.join(OUTPUT_DIR, slug);
@@ -72,9 +104,17 @@ async function buildPosts() {
         await fs.writeFile(outputPath, minified, "utf8");
 
         console.log(`✓ Built ${outputPath}`);
+
+        postsMetadata.push({
+            slug,
+            url: canonicalUrl,
+            publishedISO: datePublishedISO,
+            modifiedISO: dateModifiedISO,
+        });
     }
 
     const posts = await scanAllPosts();
+    await generateSitemap(postsMetadata);
     await updateIndexHtml(posts);
 }
 
@@ -206,7 +246,7 @@ function renderMarkdownWithToc(markdown, description) {
  */
 function extractBannerImage(html) {
     if (typeof html !== "string" || html.trim() === "") {
-        return { bannerHtml: "", contentHtml: html || "" };
+        return { bannerHtml: "", contentHtml: html || "", bannerImage: null };
     }
 
     const $ = cheerio.load(html, { decodeEntities: false }, false);
@@ -221,11 +261,22 @@ function extractBannerImage(html) {
         });
 
     if (meaningfulNodes.length === 0) {
-        return { bannerHtml: "", contentHtml: html };
+        return { bannerHtml: "", contentHtml: html, bannerImage: null };
     }
 
     const firstNode = meaningfulNodes.first();
     let bannerHtml = "";
+    let bannerImageData = null;
+
+    const captureImageData = (imgElement) => {
+        if (!imgElement || imgElement.length === 0) {
+            return;
+        }
+        bannerImageData = {
+            src: imgElement.attr("src") || "",
+            alt: imgElement.attr("alt") || "",
+        };
+    };
 
     const firstElement = firstNode[0];
 
@@ -234,6 +285,7 @@ function extractBannerImage(html) {
             const imgHtml = $.html(firstNode);
             if (imgHtml) {
                 bannerHtml = wrapBannerHtml(imgHtml);
+                captureImageData(firstNode);
                 firstNode.remove();
             }
         } else if (firstElement.name === "p") {
@@ -252,6 +304,7 @@ function extractBannerImage(html) {
                 const imgHtml = $.html(firstChild);
                 if (imgHtml) {
                     bannerHtml = wrapBannerHtml(imgHtml);
+                    captureImageData(firstChild);
                     firstNode.remove();
                 }
             }
@@ -259,15 +312,45 @@ function extractBannerImage(html) {
     }
 
     if (!bannerHtml) {
-        return { bannerHtml: "", contentHtml: html };
+        return { bannerHtml: "", contentHtml: html, bannerImage: null };
     }
 
     const contentHtml = (container.html() || "").trim();
-    return { bannerHtml, contentHtml };
+    return { bannerHtml, contentHtml, bannerImage: bannerImageData };
 }
 
 function wrapBannerHtml(imgHtml) {
     return `<div class="blog-banner">\n                        ${imgHtml}\n                    </div>`;
+}
+
+function buildOgImageUrl(imageSrc) {
+    const absolute = toAbsoluteUrl(imageSrc);
+    return absolute || DEFAULT_OG_IMAGE;
+}
+
+function toAbsoluteUrl(value) {
+    if (!value) {
+        return "";
+    }
+
+    if (value.startsWith("data:")) {
+        return value;
+    }
+
+    if (/^https?:\/\//i.test(value)) {
+        return value;
+    }
+
+    if (value.startsWith("//")) {
+        return `https:${value}`;
+    }
+
+    const cleaned = value.replace(/^(\.\.\/)+/, "").replace(/^\/+/, "");
+    if (!cleaned) {
+        return "";
+    }
+
+    return `${ROOT_URL}/${cleaned}`;
 }
 
 /**
@@ -308,6 +391,97 @@ function buildTocHtml(headings, description) {
     }
 
     return `        <div class="toc-items">\n${items.join("\n")}\n        </div>`;
+}
+
+function generateStructuredData({ title, description, url, datePublished, dateModified, image }) {
+    if (!title || !url || !datePublished) {
+        return "";
+    }
+
+    const schema = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: title,
+        description: description || "",
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": url,
+        },
+        author: {
+            "@type": "Person",
+            name: AUTHOR_NAME,
+            url: AUTHOR_URL,
+        },
+        publisher: {
+            "@type": "Organization",
+            name: PUBLISHER_NAME,
+            url: ROOT_URL,
+            logo: {
+                "@type": "ImageObject",
+                url: PUBLISHER_LOGO,
+            },
+        },
+        datePublished,
+        dateModified: dateModified || datePublished,
+    };
+
+    if (image) {
+        schema.image = image;
+    }
+
+    const json = JSON.stringify(schema);
+    return `<script type="application/ld+json">${json}</script>`;
+}
+
+async function generateSitemap(postsMetadata) {
+    const urls = [
+        {
+            loc: ROOT_URL,
+            changefreq: "monthly",
+            priority: "1.0",
+            lastmod: new Date().toISOString(),
+        },
+    ];
+
+    if (Array.isArray(postsMetadata)) {
+        postsMetadata
+            .filter((post) => post && post.url)
+            .forEach((post) => {
+                urls.push({
+                    loc: post.url,
+                    changefreq: "weekly",
+                    priority: "0.8",
+                    lastmod: post.modifiedISO || post.publishedISO || urls[0].lastmod,
+                });
+            });
+    }
+
+    const xmlLines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        ...urls.map((url) => {
+            const parts = [
+                "    <url>",
+                `        <loc>${escapeHtml(url.loc || "")}</loc>`,
+            ];
+            if (url.lastmod) {
+                parts.push(`        <lastmod>${url.lastmod}</lastmod>`);
+            }
+            if (url.changefreq) {
+                parts.push(`        <changefreq>${url.changefreq}</changefreq>`);
+            }
+            if (url.priority) {
+                parts.push(`        <priority>${url.priority}</priority>`);
+            }
+            parts.push("    </url>");
+            return parts.join("\n");
+        }),
+        "</urlset>",
+        "",
+    ];
+
+    await fs.writeFile(SITEMAP_PATH, xmlLines.join("\n"), "utf8");
+    console.log(`✓ Generated ${path.relative(process.cwd(), SITEMAP_PATH)}`);
 }
 
 function renderTocNodes(nodes, depth) {

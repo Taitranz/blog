@@ -9,12 +9,17 @@
 
     <meta name="description" content="{{description}}">
     <meta name="keywords" content="{{keywords}}">
+    <meta name="author" content="{{author}}">
 
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="article">
     <meta property="og:url" content="{{url}}">
     <meta property="og:site_name" content="Tai Tran Blog">
     <meta property="og:title" content="{{title}} — Tai Tran Blog">
     <meta property="og:description" content="{{description}}">
+    <meta property="og:image" content="{{image}}">
+    <meta property="article:author" content="{{author}}">
+    <meta property="article:published_time" content="{{dateISO}}">
+    <meta property="article:modified_time" content="{{modifiedISO}}">
 
     <link rel="icon" href="../../assets/favicon_io/favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicon_io/apple-touch-icon.png">
@@ -29,6 +34,8 @@
     <link rel="stylesheet" href="../../assets/styles/main.css">
     <link rel="stylesheet" href="../../assets/styles/media-queries.css">
     <link rel="stylesheet" href="../../assets/styles/highlight.css">
+
+    {{structuredData}}
 </head>
 
 <body>
