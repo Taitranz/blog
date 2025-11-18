@@ -41,7 +41,7 @@ async function buildPosts() {
 
     await fs.ensureDir(OUTPUT_DIR);
 
-    const postsMetadata = [];
+    const parsedPosts = [];
 
     for (const file of files) {
         const markdownPath = path.join(SOURCE_DIR, file);
@@ -58,9 +58,6 @@ async function buildPosts() {
         const slug = data.slug || file.replace(/\.md$/i, "");
         const urlFromFrontmatter = typeof data.url === "string" ? data.url.trim() : "";
         const canonicalUrl = urlFromFrontmatter || `${ROOT_URL}/posts/${slug}`;
-
-        const { html: htmlContent, tocHtml } = renderMarkdownWithToc(content, data.description);
-        const { bannerHtml, contentHtml, bannerImage } = extractBannerImage(htmlContent);
         const publishedDate = parsePostDate(data.date);
         const dateISO = publishedDate ? publishedDate.toISOString() : "";
         const modifiedDate =
@@ -70,34 +67,75 @@ async function buildPosts() {
         const modifiedISO = modifiedDate ? modifiedDate.toISOString() : dateISO;
         const datePublishedISO = dateISO || modifiedISO || "";
         const dateModifiedISO = modifiedISO || dateISO || "";
+
+        parsedPosts.push({
+            slug,
+            data,
+            content,
+            markdownStat,
+            canonicalUrl,
+            datePublishedISO,
+            dateModifiedISO,
+        });
+    }
+
+    if (parsedPosts.length === 0) {
+        console.log("No valid markdown files found after validation. Skipping build.");
+        return;
+    }
+
+    const relatedMetadata = parsedPosts
+        .map((post) => {
+            const publishedTime =
+                Date.parse(post.datePublishedISO) ||
+                Date.parse(post.dateModifiedISO) ||
+                (post.markdownStat?.mtime instanceof Date ? post.markdownStat.mtime.getTime() : 0);
+            return {
+                slug: post.slug,
+                title: post.data.title,
+                description: post.data.description || "",
+                tags: normalizeTags(post.data.tags),
+                dateDisplay: post.data.date || "",
+                publishedTime,
+            };
+        })
+        .sort((a, b) => b.publishedTime - a.publishedTime);
+
+    const postsMetadata = [];
+
+    for (const post of parsedPosts) {
+        const { html: htmlContent, tocHtml } = renderMarkdownWithToc(post.content, post.data.description);
+        const { bannerHtml, contentHtml, bannerImage } = extractBannerImage(htmlContent);
         const ogImage = buildOgImageUrl(bannerImage?.src);
         const structuredData = generateStructuredData({
-            title: data.title,
-            description: data.description || "",
-            url: canonicalUrl,
-            datePublished: datePublishedISO,
-            dateModified: dateModifiedISO,
+            title: post.data.title,
+            description: post.data.description || "",
+            url: post.canonicalUrl,
+            datePublished: post.datePublishedISO,
+            dateModified: post.dateModifiedISO,
             image: ogImage,
         });
+        const relatedPostsHtml = buildRelatedPostsSection(post.slug, relatedMetadata);
 
         const rendered = fillTemplate(template, {
-            title: escapeHtml(data.title),
-            description: escapeHtml(data.description || ""),
-            keywords: buildKeywords(data),
-            url: canonicalUrl,
-            date: escapeHtml(data.date || ""),
-            dateISO: escapeHtml(datePublishedISO),
-            modifiedISO: escapeHtml(dateModifiedISO),
+            title: escapeHtml(post.data.title),
+            description: escapeHtml(post.data.description || ""),
+            keywords: buildKeywords(post.data),
+            url: post.canonicalUrl,
+            date: escapeHtml(post.data.date || ""),
+            dateISO: escapeHtml(post.datePublishedISO),
+            modifiedISO: escapeHtml(post.dateModifiedISO),
             author: escapeHtml(AUTHOR_NAME),
             image: escapeHtml(ogImage),
-            tags: buildTagsHtml(data.tags),
+            tags: buildTagsHtml(post.data.tags),
             toc: tocHtml,
             banner: bannerHtml,
             content: contentHtml,
+            relatedPosts: relatedPostsHtml,
             structuredData: structuredData ? `    ${structuredData}` : "",
         });
 
-        const postDir = path.join(OUTPUT_DIR, slug);
+        const postDir = path.join(OUTPUT_DIR, post.slug);
         await fs.ensureDir(postDir);
         const outputPath = path.join(postDir, "index.html");
         const minified = minifyHtml(rendered);
@@ -106,10 +144,10 @@ async function buildPosts() {
         console.log(`✓ Built ${outputPath}`);
 
         postsMetadata.push({
-            slug,
-            url: canonicalUrl,
-            publishedISO: datePublishedISO,
-            modifiedISO: dateModifiedISO,
+            slug: post.slug,
+            url: post.canonicalUrl,
+            publishedISO: post.datePublishedISO,
+            modifiedISO: post.dateModifiedISO,
         });
     }
 
@@ -184,15 +222,24 @@ function buildKeywords(data) {
  * Render tags into HTML blocks.
  */
 function buildTagsHtml(tags) {
-    if (!Array.isArray(tags) || tags.length === 0) {
+    const normalizedTags = normalizeTags(tags);
+    if (normalizedTags.length === 0) {
         return "";
     }
 
-    return tags
-        .map((tag) => tag && String(tag).trim())
-        .filter(Boolean)
+    return normalizedTags
         .map((tag) => `                            <div class="tag">\n                                ${escapeHtml(tag)}\n                            </div>`)
         .join("\n");
+}
+
+function normalizeTags(tags) {
+    if (!Array.isArray(tags) || tags.length === 0) {
+        return [];
+    }
+
+    return tags
+        .map((tag) => (tag && String(tag).trim()) || "")
+        .filter(Boolean);
 }
 
 /**
@@ -919,6 +966,94 @@ function renderBlogContainers(posts, baseIndent) {
             ].join("\n");
         })
         .join("\n\n");
+}
+
+function buildRelatedPostsSection(currentSlug, allPostsMetadata, limit = 3) {
+    if (!Array.isArray(allPostsMetadata) || allPostsMetadata.length < 2) {
+        return "";
+    }
+
+    const related = [];
+    for (const post of allPostsMetadata) {
+        if (!post || post.slug === currentSlug) {
+            continue;
+        }
+        related.push(post);
+        if (related.length === limit) {
+            break;
+        }
+    }
+
+    if (related.length === 0) {
+        return "";
+    }
+
+    const itemsHtml = related
+        .map((post) => {
+            const description = truncateText(post.description, 220);
+            const descriptionBlock = description
+                ? `                        <p class="related-post-description">${escapeHtml(description)}</p>`
+                : "";
+
+            const tagsHtml =
+                Array.isArray(post.tags) && post.tags.length > 0
+                    ? [
+                          "                        <div class=\"tags\">",
+                          post.tags
+                              .map((tag) => `                            <div class="tag">${escapeHtml(tag)}</div>`)
+                              .join("\n"),
+                          "                        </div>",
+                      ].join("\n")
+                    : "";
+
+            const dateBlock = post.dateDisplay
+                ? `                        <span class="related-post-date">${escapeHtml(post.dateDisplay)}</span>`
+                : "";
+
+            const metaSections = [dateBlock, tagsHtml].filter(Boolean);
+            const metaBlock = metaSections.length
+                ? ["                        <div class=\"related-post-meta\">", ...metaSections, "                        </div>"].join("\n")
+                : "";
+
+            return [
+                "                    <li>",
+                `                        <a href="/posts/${escapeHtml(post.slug)}" class="related-post-title">${escapeHtml(post.title)}</a>`,
+                descriptionBlock,
+                metaBlock,
+                "                    </li>",
+            ]
+                .filter(Boolean)
+                .join("\n");
+        })
+        .join("\n");
+
+    return [
+        '                <div class="related-posts">',
+        "                    <h3>More from the blog</h3>",
+        "                    <ul>",
+        itemsHtml,
+        "                    </ul>",
+        "                </div>",
+    ].join("\n");
+}
+
+function truncateText(value, limit = 200) {
+    const text = String(value || "").trim();
+    if (!text) {
+        return "";
+    }
+
+    if (text.length <= limit) {
+        return text;
+    }
+
+    let truncated = text.slice(0, Math.max(limit - 3, 0)).trimEnd();
+    const lastSpace = truncated.lastIndexOf(" ");
+    if (lastSpace > 60) {
+        truncated = truncated.slice(0, lastSpace);
+    }
+
+    return `${truncated}...`;
 }
 
 /**
