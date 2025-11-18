@@ -1,7 +1,7 @@
 ---
-title: "Valgo: An Agentic LLM-Driven Trading System for EUR/USD"
+title: "Valgo: An Agentic Trading System for EUR/USD"
 date: "18-11-2025 21:27:13"
-description: "Valgo: An Agentic LLM-Driven Trading System for EUR/USD"
+description: "Valgo: An Agentic Trading System for EUR/USD"
 tags:
   - "AI Trading Systems"
   - "Algorithmic Trading"
@@ -9,7 +9,7 @@ tags:
   - "Forex Trading"
 ---
 
-### Valgo: An Agentic LLM-Driven Trading System for EUR/USD 
+### Valgo: An Agentic Trading System for EUR/USD 
 
 ## Mission and Vision of Valgo
 
