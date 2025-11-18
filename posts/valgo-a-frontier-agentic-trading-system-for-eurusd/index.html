@@ -15,17 +15,11 @@
             property="og:description"
             content="Valgo: A Frontier Agentic Trading System"
         /><meta property="og:image" content="https://blog.taitranz.com/assets/favicon_io/android-chrome-512x512.png" /><meta
-            name="twitter:card"
-            content="summary_large_image"
-        /><meta name="twitter:title" content="Valgo: A Frontier Agentic Trading System — Tai Tran Blog" /><meta
-            name="twitter:description"
-            content="Valgo: A Frontier Agentic Trading System"
-        /><meta name="twitter:image" content="https://blog.taitranz.com/assets/favicon_io/android-chrome-512x512.png" /><meta
             property="article:author"
             content="Tai Tran"
         /><meta property="article:published_time" content="2025-11-18T11:27:13.000Z" /><meta
             property="article:modified_time"
-            content="2025-11-18T21:12:48.491Z"
+            content="2025-11-18T21:59:48.892Z"
         /><link rel="icon" href="../../assets/favicon_io/favicon.ico" type="image/x-icon" /><link
             rel="apple-touch-icon"
             sizes="180x180"
@@ -46,26 +40,6 @@
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                    {
-                        "@type": "ListItem",
-                        "position": 1,
-                        "name": "Home",
-                        "item": "https://blog.taitranz.com"
-                    },
-                    {
-                        "@type": "ListItem",
-                        "position": 2,
-                        "name": "Valgo: A Frontier Agentic Trading System",
-                        "item": "https://blog.taitranz.com/posts/valgo-a-frontier-agentic-trading-system-for-eurusd"
-                    }
-                ]
-            }
-        </script>
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
                 "@type": "BlogPosting",
                 "headline": "Valgo: A Frontier Agentic Trading System",
                 "description": "Valgo: A Frontier Agentic Trading System",
@@ -78,7 +52,7 @@
                     "logo": { "@type": "ImageObject", "url": "https://blog.taitranz.com/assets/favicon_io/android-chrome-512x512.png" }
                 },
                 "datePublished": "2025-11-18T11:27:13.000Z",
-                "dateModified": "2025-11-18T21:12:48.491Z",
+                "dateModified": "2025-11-18T21:59:48.892Z",
                 "image": "https://blog.taitranz.com/assets/favicon_io/android-chrome-512x512.png"
             }
         </script> </head
@@ -109,6 +83,8 @@
                     ></div
                 ><div class="item toc-item level-2" data-target="execution-engine-from-decision-to-trade-placement"
                     ><a href="#execution-engine-from-decision-to-trade-placement">Execution Engine: From Decision to Trade Placement</a></div
+                ><div class="item toc-item level-2" data-target="validation-roadmap-and-technical-challenges"
+                    ><a href="#validation-roadmap-and-technical-challenges">Validation Roadmap and Technical Challenges</a></div
                 ><div class="item toc-item level-2" data-target="closing-the-loop-from-data-to-insight-to-autonomous-execution"
                     ><a href="#closing-the-loop-from-data-to-insight-to-autonomous-execution"
                         >Closing the Loop: From Data to Insight to<br />Autonomous Execution</a
@@ -592,6 +568,44 @@
                                 execution closes the autonomous trading loop. The agent’s strategies are not just theoretical decisions; they directly influence
                                 market positions, and the outcomes of those positions feed back into the system’s knowledge. This tightly integrated cycle from
                                 decision to execution to outcome is what allows Valgo to operate as a true autonomous trading agent.</p
+                            ><h2 id="validation-roadmap-and-technical-challenges">Validation Roadmap and Technical Challenges</h2
+                            ><p
+                                >While Valgo demonstrates a production-grade architecture and a novel approach to agentic integration, it is important to
+                                distinguish between the maturity of the software engineering and the validation of the trading strategy. The system currently
+                                serves as a powerful &quot;concept piece&quot; for how LLMs can be integrated into a finance loop, but several technical and
+                                quantitative challenges remain to move from a research prototype to an edge-bearing alpha generator.</p
+                            ><h3 id="quantitative-performance-and-overfitting-risks">Quantitative Performance and Overfitting Risks</h3
+                            ><p
+                                >The most immediate hurdle is rigorous performance verification. Although the simulation engine produces metrics like win rate
+                                and Sharpe ratio, these must be validated on large-scale out-of-sample datasets to ensure the strategy is not overfitted.</p
+                            ><ul
+                                ><li
+                                    ><strong>Backtesting Rigour</strong>: Future updates will focus on publishing results from split-sample testing (e.g.
+                                    training on 2020–2022 data, testing on 2023–2024) with realistic transaction costs, spreads, and slippage models.</li
+                                ><li
+                                    ><strong>&quot;Digital Twin&quot; Overfitting</strong>: There is a risk that the LLM, by mimicking a specific trader&#39;s
+                                    history, merely memorises past actions rather than learning generalisable logic. To address this, we plan to benchmark the
+                                    LLM agent against simpler baselines—such as a static rule-based engine and a gradient boosting model—using the same
+                                    structured inputs. This will isolate the incremental value, if any, of the LLM&#39;s reasoning capabilities.</li
+                                ></ul
+                            ><h3 id="latency-and-real-time-constraints">Latency and Real-Time Constraints</h3
+                            ><p>Deploying an LLM in a real-time trading loop introduces latency challenges that do not exist in standard algorithmic trading.</p
+                            ><ul
+                                ><li
+                                    ><strong>Inference Latency</strong>: The time taken for the LLM to ingest the state, generate tokens, and parse the output
+                                    (the &quot;market data to order&quot; loop) must be strictly characterised. While acceptable for 1-hour candles, this
+                                    latency may be prohibitive for 1-minute or 5-minute scalping strategies.</li
+                                ><li
+                                    ><strong>Robustness</strong>: The system must handle non-deterministic failure modes, such as LLM timeouts, hallucinations,
+                                    or malformed JSON outputs, without entering undefined states.</li
+                                ></ul
+                            ><h3 id="validating-smart-money-concepts-smc">Validating Smart Money Concepts (SMC)</h3
+                            ><p
+                                >Valgo relies heavily on &quot;Smart Money Concepts&quot; (SMC) like Break of Structure (BOS) and Liquidity Sweeps as
+                                first-class signal sources. While these align with the domain expert&#39;s discretionary style, they require statistical
+                                validation to prove they hold positive expectancy on EUR/USD across different market regimes. We aim to conduct sensitivity
+                                analyses on the definitions of these patterns (e.g. swing depth, wick ratios) to ensure the underlying signals are robust and
+                                not just visual artifacts.</p
                             ><h2 id="closing-the-loop-from-data-to-insight-to-autonomous-execution"
                                 >Closing the Loop: From Data to Insight to Autonomous Execution</h2
                             ><p

@@ -212,6 +212,26 @@ The engine also manages trailing stops, either by an algorithm (e.g. moving stop
 
 Overall, the execution component of Valgo ensures that once a trade decision is made, it is carried out swiftly and safely. With robust risk checks, flexible connectivity to real or simulated brokers, and constant feedback loops, Valgo’s trade execution closes the autonomous trading loop. The agent’s strategies are not just theoretical decisions; they directly influence market positions, and the outcomes of those positions feed back into the system’s knowledge. This tightly integrated cycle from decision to execution to outcome is what allows Valgo to operate as a true autonomous trading agent.
 
+## Validation Roadmap and Technical Challenges
+
+While Valgo demonstrates a production-grade architecture and a novel approach to agentic integration, it is important to distinguish between the maturity of the software engineering and the validation of the trading strategy. The system currently serves as a powerful "concept piece" for how LLMs can be integrated into a finance loop, but several technical and quantitative challenges remain to move from a research prototype to an edge-bearing alpha generator.
+
+### Quantitative Performance and Overfitting Risks
+
+The most immediate hurdle is rigorous performance verification. Although the simulation engine produces metrics like win rate and Sharpe ratio, these must be validated on large-scale out-of-sample datasets to ensure the strategy is not overfitted.
+- **Backtesting Rigour**: Future updates will focus on publishing results from split-sample testing (e.g. training on 2020–2022 data, testing on 2023–2024) with realistic transaction costs, spreads, and slippage models.
+- **"Digital Twin" Overfitting**: There is a risk that the LLM, by mimicking a specific trader's history, merely memorises past actions rather than learning generalisable logic. To address this, we plan to benchmark the LLM agent against simpler baselines—such as a static rule-based engine and a gradient boosting model—using the same structured inputs. This will isolate the incremental value, if any, of the LLM's reasoning capabilities.
+
+### Latency and Real-Time Constraints
+
+Deploying an LLM in a real-time trading loop introduces latency challenges that do not exist in standard algorithmic trading.
+- **Inference Latency**: The time taken for the LLM to ingest the state, generate tokens, and parse the output (the "market data to order" loop) must be strictly characterised. While acceptable for 1-hour candles, this latency may be prohibitive for 1-minute or 5-minute scalping strategies.
+- **Robustness**: The system must handle non-deterministic failure modes, such as LLM timeouts, hallucinations, or malformed JSON outputs, without entering undefined states.
+
+### Validating Smart Money Concepts (SMC)
+
+Valgo relies heavily on "Smart Money Concepts" (SMC) like Break of Structure (BOS) and Liquidity Sweeps as first-class signal sources. While these align with the domain expert's discretionary style, they require statistical validation to prove they hold positive expectancy on EUR/USD across different market regimes. We aim to conduct sensitivity analyses on the definitions of these patterns (e.g. swing depth, wick ratios) to ensure the underlying signals are robust and not just visual artifacts.
+
 ## Closing the Loop: From Data to Insight to Autonomous Execution
 
 Valgo brings together all the components discussed above into a unified platform that closes the loop in the trading process. It stands out among trading systems by handling the entire workflow, from raw data ingestion to insightful analysis to decision-making and finally to trade execution, with minimal human input. This end-to-end autonomy is built on a foundation of transparency, adaptability, and expert knowledge integration.
