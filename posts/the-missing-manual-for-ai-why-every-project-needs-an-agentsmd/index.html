@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en"
+    ><head
+        ><meta charset="UTF-8" /><title>The Missing Manual for AI: Why Every Project Needs an AGENTS.md — Tai Tran Blog</title
+        ><meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta
+            name="description"
+            content="The Missing Manual for AI: Why Every Project Needs an AGENTS.md"
+        /><meta name="keywords" content="AI Agents, Repository Engineering, LLM Context, Software Architecture" /><meta name="author" content="Tai Tran" /><meta
+            property="og:type"
+            content="article"
+        /><meta property="og:url" content="https://blog.taitranz.com/posts/the-missing-manual-for-ai-why-every-project-needs-an-agentsmd" /><meta
+            property="og:site_name"
+            content="Tai Tran Blog"
+        /><meta property="og:title" content="The Missing Manual for AI: Why Every Project Needs an AGENTS.md — Tai Tran Blog" /><meta
+            property="og:description"
+            content="The Missing Manual for AI: Why Every Project Needs an AGENTS.md"
+        /><meta property="og:image" content="https://blog.taitranz.com/assets/images/the_missing_manual_for_ai.png" /><meta
+            property="article:author"
+            content="Tai Tran"
+        /><meta property="article:published_time" content="2025-11-21T13:26:04.000Z" /><meta
+            property="article:modified_time"
+            content="2025-11-21T13:31:24.009Z"
+        /><link rel="icon" href="../../assets/favicon_io/favicon.ico" type="image/x-icon" /><link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="../../assets/favicon_io/apple-touch-icon.png"
+        /><link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon_io/favicon-32x32.png" /><link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="../../assets/favicon_io/favicon-16x16.png"
+        /><link rel="manifest" href="../../assets/favicon_io/site.webmanifest" /><link
+            rel="canonical"
+            href="https://blog.taitranz.com/posts/the-missing-manual-for-ai-why-every-project-needs-an-agentsmd"
+        /><link rel="stylesheet" href="../../assets/styles/fonts.css" /><link rel="stylesheet" href="../../assets/styles/variables.css" /><link
+            rel="stylesheet"
+            href="../../assets/styles/main.css"
+        /><link rel="stylesheet" href="../../assets/styles/media-queries.css" /><link rel="stylesheet" href="../../assets/styles/highlight.css" />
+
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "headline": "The Missing Manual for AI: Why Every Project Needs an AGENTS.md",
+                "description": "The Missing Manual for AI: Why Every Project Needs an AGENTS.md",
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": "https://blog.taitranz.com/posts/the-missing-manual-for-ai-why-every-project-needs-an-agentsmd"
+                },
+                "author": { "@type": "Person", "name": "Tai Tran", "url": "https://taitranz.com/" },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Tai Tran Blog",
+                    "url": "https://blog.taitranz.com",
+                    "logo": { "@type": "ImageObject", "url": "https://blog.taitranz.com/assets/favicon_io/android-chrome-512x512.png" }
+                },
+                "datePublished": "2025-11-21T13:26:04.000Z",
+                "dateModified": "2025-11-21T13:31:24.009Z",
+                "image": "https://blog.taitranz.com/assets/images/the_missing_manual_for_ai.png"
+            }
+        </script> </head
+    ><body
+        ><header class="blog-header"
+            ><div class="content"
+                ><h1><a href="../../" style="color: inherit; text-decoration: none">Tai Tran</a></h1
+                ><div class="hamburger-menu-centered" aria-label="Toggle navigation menu"><span></span><span></span></div></div></header
+        ><nav class="blog-nav"
+            ><div class="item toc-heading">Table of Contents</div
+            ><div class="toc-items"
+                ><div class="item toc-item level-description" data-target="post-top"
+                    ><a href="#post-top">The Missing Manual for AI: Why Every Project Needs<br />an AGENTS.md</a></div
+                ><div class="item toc-item level-2" data-target="the-quotsenior-dev-with-amnesiaquot-problem"
+                    ><a href="#the-quotsenior-dev-with-amnesiaquot-problem">The &quot;Senior Dev with Amnesia&quot; Problem</a></div
+                ><div class="item toc-item level-2" data-target="what-is-agentsmd"><a href="#what-is-agentsmd">What is AGENTS.md?</a></div
+                ><div class="item toc-item level-2" data-target="the-anatomy-of-an-effective-agentsmd"
+                    ><a href="#the-anatomy-of-an-effective-agentsmd">The Anatomy of an Effective AGENTS.md</a></div
+                ><div class="item toc-item level-2" data-target="the-token-economics-a-business-case"
+                    ><a href="#the-token-economics-a-business-case">The Token Economics: A Business Case</a></div
+                ><div class="item toc-item level-2" data-target="from-prompt-engineering-to-quotrepository-engineeringquot"
+                    ><a href="#from-prompt-engineering-to-quotrepository-engineeringquot"
+                        >From Prompt Engineering to &quot;Repository<br />Engineering&quot;</a
+                    ></div
+                ><div class="item toc-item level-2" data-target="conclusion"><a href="#conclusion">Conclusion</a></div></div
+            ></nav
+        ><div class="overlay"></div
+        ><main class="blog-main"
+            ><section class="section blog"
+                ><div class="content"
+                    ><div class="blog-container" id="post-top"
+                        ><div class="blog-banner"><img src="../../assets/images/the_missing_manual_for_ai.png" alt="AGENTS.md Preview" /></div
+                        ><div class="title"> The Missing Manual for AI: Why Every Project Needs an AGENTS.md </div
+                        ><div class="details"
+                            ><div class="date"> 21-11-2025 23:26:04 </div
+                            ><div class="tags"
+                                ><div class="tag"> AI Agents </div><div class="tag"> Repository Engineering </div><div class="tag"> LLM Context </div
+                                ><div class="tag"> Software Architecture </div></div
+                            ></div
+                        ><div class="overview"
+                            ><h1 id="the-missing-manual-for-ai-why-every-project-needs-an-agentsmd"
+                                >The Missing Manual for AI: Why Every Project Needs an <code>AGENTS.md</code></h1
+                            ><p
+                                >We are currently witnessing a fundamental shift in how software is built. We have moved past the era of "AI as a fancy
+                                autocomplete" and entered the era of "AI as an autonomous agent." These agents can plan, navigate file systems, execute terminal
+                                commands, and implement complex features across multiple files.</p
+                            ><p>However, there is a catch.</p
+                            ><p
+                                >While these models are incredibly smart, they are also incredibly ignorant. They have read the entire internet, yet they know
+                                absolutely nothing about your specific project. They do not know your variable naming conventions. They do not know why you
+                                chose SQLite over PostgreSQL. They do not know that you strictly forbid the use of <code>try/except: pass</code>.</p
+                            ><p
+                                >When you drop a new human engineer into a codebase, you give them an onboarding buddy, a wiki, and a few days to read the docs.
+                                When you drop an AI agent into a codebase, it usually gets none of that. It is expected to perform instantly, often leading to
+                                subtle architectural violations, reinvention of existing wheels, and "drift" in coding style.</p
+                            ><p
+                                >This is where <strong><code>AGENTS.md</code></strong> comes in.</p
+                            ><p
+                                >It is a simple concept with profound implications: A Markdown file at the root of your repository, written specifically for an
+                                AI to read. It is not a <code>README.md</code> for humans. It is a system prompt for your repository.</p
+                            ><p
+                                >In this post, we will explore why <code>AGENTS.md</code> is the most critical file you aren't writing, how to structure it, and
+                                why the token cost is a trade-off you should happily make.</p
+                            ><h2 id="the-quotsenior-dev-with-amnesiaquot-problem">The "Senior Dev with Amnesia" Problem</h2
+                            ><p
+                                >Imagine hiring a Senior Staff Engineer from Google. They know Python inside and out. They know distributed systems. They know
+                                algorithms.</p
+                            ><p>Now imagine that every time they sit down to write code for you, they have total amnesia about your company.</p
+                            ><p
+                                >They sit down and think: <em>"I need to add a user. I'll just write a direct SQL query."</em> You shout:
+                                <em>"No! We use an ORM!"</em> They say: <em>"Oh, right. I'll use SQLAlchemy."</em> You shout:
+                                <em>"No! We use Django ORM!"</em></p
+                            ><p
+                                >This is what interacting with an AI agent feels like without <code>AGENTS.md</code>. You spend the first ten turns of every
+                                conversation correcting its assumptions.</p
+                            ><ul
+                                ><li>"Don't use <code>unittest</code>, use <code>pytest</code>."</li
+                                ><li>"We don't use f-strings for logging, use lazy interpolation."</li
+                                ><li>"This is a hexagonal architecture, you can't import the database in the domain layer."</li></ul
+                            ><p>This "Correction Loop" is exhausting. It wastes your time, and crucially, it wastes your context window.</p
+                            ><h2 id="what-is-agentsmd">What is <code>AGENTS.md</code>?</h2
+                            ><p
+                                ><code>AGENTS.md</code> is a high-density context file. It acts as a bridge between the model's general training and your
+                                project's specific reality.</p
+                            ><p>It serves three primary functions:</p
+                            ><ol
+                                ><li><strong>Orientation:</strong> It tells the agent where things are.</li
+                                ><li><strong>Constraint:</strong> It tells the agent what is forbidden.</li
+                                ><li><strong>Instruction:</strong> It tells the agent how to perform common tasks.</li></ol
+                            ><p
+                                >Unlike a human <code>README</code>, which might be full of marketing fluff or setup instructions, <code>AGENTS.md</code> is
+                                purely functional. It is dense, imperative, and unambiguous.</p
+                            ><h2 id="the-anatomy-of-an-effective-agentsmd">The Anatomy of an Effective <code>AGENTS.md</code></h2
+                            ><p>Based on our experiments with large-scale agentic workflows, here is the ideal structure for an <code>AGENTS.md</code> file.</p
+                            ><h3 id="1-the-quothigh-level-mapquot">1. The "High-Level Map"</h3
+                            ><p>The first thing an agent does is scan the file list. Without context, a file named <code>utils.py</code> could mean anything.</p
+                            ><p>Your <code>AGENTS.md</code> should start with a pragmatic map:</p
+                            ><blockquote
+                                ><p><strong>System Architecture</strong></p
+                                ><ul
+                                    ><li><code>core/</code>: Pure domain logic. No external dependencies.</li
+                                    ><li><code>adapters/</code>: Infrastructure code (Database, API clients).</li
+                                    ><li><code>gui/</code>: Qt/VisPy frontend code.</li
+                                    ><li><code>shared/</code>: Dependency Injection container and config.</li></ul
+                                ></blockquote
+                            ><p
+                                >This prevents the "grep search" phase where the agent blindly reads five unrelated files trying to find where the user model is
+                                defined.</p
+                            ><h3 id="2-the-quotnegative-constraintsquot-the-rules">2. The "Negative Constraints" (The Rules)</h3
+                            ><p
+                                >AI models are eager to please. If you ask for a feature, they will give you the quickest solution, which is often the dirtiest
+                                one. You need to explicitly block bad patterns.</p
+                            ><p>We call these <strong>Critical Rules</strong>:</p
+                            ><blockquote
+                                ><p><strong>Critical Rules</strong></p
+                                ><ol
+                                    ><li
+                                        ><strong>No Logic in UI:</strong> Never put business logic in <code>Qt</code> widgets. Use the
+                                        <code>Controller</code> classes.</li
+                                    ><li
+                                        ><strong>Thread Safety:</strong> The GUI runs on the main thread. All heavy computation must be offloaded to
+                                        <code>Worker</code> threads.</li
+                                    ><li><strong>No Raw SQL:</strong> Always use the <code>Repository</code> interface.</li
+                                    ><li><strong>No Emojis:</strong> Do not add emojis to code comments or commit messages.</li></ol
+                                ></blockquote
+                            ><p
+                                >These negative constraints are powerful because they prune the search space. The agent stops considering "quick hacks" because
+                                you have explicitly forbidden them.</p
+                            ><h3 id="3-the-quottech-stackquot-reality-check">3. The "Tech Stack" Reality Check</h3
+                            ><p
+                                >You would be surprised how often an AI guesses the wrong version of a library. It might generate code for
+                                <code>Pydantic v1</code> when you are on <code>v2</code>.</p
+                            ><p>Your <code>AGENTS.md</code> must be specific:</p
+                            ><blockquote
+                                ><p><strong>Tech Stack</strong></p
+                                ><ul
+                                    ><li><strong>Language:</strong> Python 3.13.8</li
+                                    ><li><strong>Frontend:</strong> PySide6 (Qt6)</li
+                                    ><li><strong>Backend:</strong> SQLite with WAL mode</li
+                                    ><li><strong>Key Libs:</strong> VisPy (OpenGL), CuPy (CUDA acceleration)</li></ul
+                                ></blockquote
+                            ><p>This eliminates the "Import Error" loop where the agent tries to import a module that was deprecated three years ago.</p
+                            ><h3 id="4-the-quotknown-issuesquot-here-be-dragons">4. The "Known Issues" (Here Be Dragons)</h3
+                            ><p
+                                >Every codebase has skeletons. Maybe there is a specific function that crashes if you call it too fast. Maybe there is a
+                                circular dependency in the user module that you haven't fixed yet.</p
+                            ><p>Tell the agent about them!</p
+                            ><blockquote
+                                ><p><strong>Known Issues</strong></p
+                                ><ul
+                                    ><li
+                                        ><strong>VisPy Crashes:</strong> Rapidly switching intervals can crash the canvas. Use the <code>QMutex</code> lock when
+                                        updating chart data.</li
+                                    ><li
+                                        ><strong>OANDA Data Gaps:</strong> The data feed sometimes returns gaps. Use the <code>GapFiller</code> service, do not
+                                        try to interpolate manually.</li
+                                    ></ul
+                                ></blockquote
+                            ><p>This turns a potential 2-hour debugging nightmare into a simple "Oh, I need to use the mutex" moment for the agent.</p
+                            ><h2 id="the-token-economics-a-business-case">The Token Economics: A Business Case</h2
+                            ><p>The most common objection to <code>AGENTS.md</code> is token usage.</p
+                            ><p
+                                ><em
+                                    >"My context window is 128k (or 200k) tokens. Why should I fill 2,000 of them with static documentation at the start of
+                                    every single chat? That costs money!"</em
+                                ></p
+                            ><p>Let's do the maths.</p><p><strong>Scenario A: The "Save Tokens" Approach</strong></p
+                            ><ol
+                                ><li>You prompt the agent: "Add a button to fetch historical data." (50 tokens)</li
+                                ><li>The agent hallucinates a solution using <code>requests</code> directly in the UI thread. (500 tokens output)</li
+                                ><li>You read it and type: "No, you blocked the UI. Use the async worker." (50 tokens)</li
+                                ><li>The agent apologises and rewrites it, but forgets to use the <code>LoggingManager</code>. (500 tokens output)</li
+                                ><li>You correct it again: "Use structured logging." (20 tokens)</li
+                                ><li>The agent rewrites it again. (500 tokens output)</li></ol
+                            ><p><strong>Total Cost:</strong> ~1,600 tokens + 15 minutes of your time + frustration.</p
+                            ><p><strong>Scenario B: The "<code>AGENTS.md</code>" Approach</strong></p
+                            ><ol
+                                ><li>You inject <code>AGENTS.md</code> into the system prompt. (2,000 tokens)</li
+                                ><li>You prompt: "Add a button to fetch historical data." (50 tokens)</li
+                                ><li>The agent reads the rules: <em>UI must use Workers. Use LoggingManager.</em></li
+                                ><li>The agent generates the correct, async, logged solution on the first try. (500 tokens output)</li></ol
+                            ><p><strong>Total Cost:</strong> ~2,550 tokens + 0 minutes of your time.</p
+                            ><p
+                                >Yes, the <em>raw token count</em> is higher in Scenario B. But the <strong>Engineering Value</strong> is infinitely higher. You
+                                traded cheap compute tokens for expensive human attention tokens.</p
+                            ><p
+                                >Furthermore, context caching is becoming standard. Many providers now cache the prefix of your prompt (the system instructions
+                                and files). Since <code>AGENTS.md</code> rarely changes between chats, you often pay the "read cost" only once per session or
+                                day, making the economics even more favourable.</p
+                            ><h2 id="from-prompt-engineering-to-quotrepository-engineeringquot">From Prompt Engineering to "Repository Engineering"</h2
+                            ><p
+                                >We are moving away from the art of writing the perfect prompt into the chat box. We are moving towards
+                                <strong>Repository Engineering</strong>: structuring your code and documentation so that it is "machine-readable" by default.</p
+                            ><p><code>AGENTS.md</code> is the flagship of this movement.</p
+                            ><p>It acknowledges that your code is going to be read by machines more often than by humans. It optimises for that reality.</p
+                            ><h3 id="how-to-write-your-own-agentsmd">How to Write Your Own <code>AGENTS.md</code></h3
+                            ><p>Do not overthink it. You do not need perfect prose. Agents prefer bullet points.</p
+                            ><ol
+                                ><li><strong>Start Small:</strong> Create the file. List your stack. List your top 3 "Do Not Do This" rules.</li
+                                ><li
+                                    ><strong>Iterate:</strong> Every time the agent makes a mistake that you have to correct, add a rule to
+                                    <code>AGENTS.md</code>.<ul
+                                        ><li
+                                            ><em>Agent used <code>print()</code>?</em> -&gt; Add rule: "Use <code>logger.info()</code>".</li
+                                        ><li
+                                            ><em>Agent created a new <code>utils.py</code>?</em> -&gt; Add rule: "Put utilities in
+                                            <code>shared/utilities</code>".</li
+                                        ></ul
+                                    ></li
+                                ><li
+                                    ><strong>Link Deeper:</strong> As your project grows, <code>AGENTS.md</code> should become an index. Point to
+                                    <code>docs/architecture.md</code> or <code>docs/testing.md</code>. The agent can decide to read those if it needs deep
+                                    detail, but <code>AGENTS.md</code> gives it the overview.</li
+                                ></ol
+                            ><h2 id="conclusion">Conclusion</h2
+                            ><p>The difference between a frustrating AI experience and a magical one is often just Context.</p
+                            ><p
+                                >We are used to carrying the context in our heads. We know where the bodies are buried. We know why the
+                                <code>UserFactory</code> is implemented that way. But the AI doesn't.</p
+                            ><p
+                                ><code>AGENTS.md</code> is how you download your mental model of the software into the agent's working memory. It is a bridge.
+                                It is a guardrail. And in a world where we pay by the token but profit by the feature, it is the most efficient way to scale
+                                your software development.</p
+                            ><p>So, go ahead. Create the file. Give your agent a brain. Your future self (and your token budget) will thank you.</p></div
+                        ></div
+                    ><div class="related-posts"
+                        ><h3>More from the blog</h3
+                        ><ul
+                            ><li
+                                ><a href="/posts/valgo-a-frontier-agentic-trading-system-for-eurusd" class="related-post-title"
+                                    >Valgo: An Agentic Trading System for EUR/USD</a
+                                ><p class="related-post-description">Valgo: An Agentic Trading System for EUR/USD</p
+                                ><div class="related-post-meta"
+                                    ><span class="related-post-date">18-11-2025 21:27:13</span
+                                    ><div class="tags"
+                                        ><div class="tag">AI Trading Systems</div><div class="tag">Algorithmic Trading</div><div class="tag">Agentic AI</div
+                                        ><div class="tag">Forex Trading</div></div
+                                    ></div
+                                ></li
+                            ><li
+                                ><a href="/posts/nov11-valgo-progress-update" class="related-post-title">NOV11 Valgo Progress Update</a
+                                ><p class="related-post-description">Progress report on architecture decisions, performance optimisations</p
+                                ><div class="related-post-meta"
+                                    ><span class="related-post-date">10-11-2025 14:00:00</span
+                                    ><div class="tags"
+                                        ><div class="tag">Python</div><div class="tag">Architecture</div><div class="tag">Performance</div
+                                        ><div class="tag">Trading</div></div
+                                    ></div
+                                ></li
+                            ><li
+                                ><a href="/posts/your-ai-assistant-doesnt-need-better-inference-it-needs-better-documentation" class="related-post-title"
+                                    >Your AI Assistant Doesn&#39;t Need Better Inference. It Needs Better Documentation</a
+                                ><p class="related-post-description">Your AI Assistant Doesn&#39;t Need Better Inference. It Needs Better Documentation</p
+                                ><div class="related-post-meta"
+                                    ><span class="related-post-date">10-11-2025 12:00:00</span
+                                    ><div class="tags"
+                                        ><div class="tag">AI Development</div><div class="tag">Documentation</div><div class="tag">Code Quality</div
+                                        ><div class="tag">Developer Productivity</div></div
+                                    ></div
+                                ></li
+                            ></ul
+                        ></div
+                    ></div
+                ></section
+            ></main
+        >
+        <script src="../../assets/scripts/blog-post.js"></script> </body
+></html>

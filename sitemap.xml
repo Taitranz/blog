@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://blog.taitranz.com</loc>
-        <lastmod>2025-11-18T22:17:01.617Z</lastmod>
+        <lastmod>2025-11-21T13:32:03.314Z</lastmod>
         <changefreq>monthly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -25,8 +25,14 @@
         <priority>0.8</priority>
     </url>
     <url>
+        <loc>https://blog.taitranz.com/posts/the-missing-manual-for-ai-why-every-project-needs-an-agentsmd</loc>
+        <lastmod>2025-11-21T13:31:24.009Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
         <loc>https://blog.taitranz.com/posts/valgo-a-frontier-agentic-trading-system-for-eurusd</loc>
-        <lastmod>2025-11-18T22:16:56.396Z</lastmod>
+        <lastmod>2025-11-18T22:21:35.472Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
