@@ -474,7 +474,6 @@
     .blog-nav {
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease;
     }
 
     .hamburger-menu-centered {
@@ -567,7 +566,6 @@
     .blog-nav {
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.3s ease;
     }
 
     .hamburger-menu-centered {
