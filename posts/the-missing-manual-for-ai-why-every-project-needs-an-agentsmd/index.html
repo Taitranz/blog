@@ -220,7 +220,7 @@
                                     >"My context window is 128k (or 200k) tokens. Why should I fill 2,000 of them with static documentation at the start of
                                     every single chat? That costs money!"</em
                                 ></p
-                            ><p>Let's do the maths.</p><p><strong>Scenario A: The "Save Tokens" Approach</strong></p
+                            ><p>Let's do the maths.</p><p><strong>Scenario A: The "Save Tokens" Approach (Best Case)</strong></p
                             ><ol
                                 ><li>You prompt the agent: "Add a button to fetch historical data." (50 tokens)</li
                                 ><li>The agent hallucinates a solution using <code>requests</code> directly in the UI thread. (500 tokens output)</li
@@ -229,7 +229,16 @@
                                 ><li>You correct it again: "Use structured logging." (20 tokens)</li
                                 ><li>The agent rewrites it again. (500 tokens output)</li></ol
                             ><p><strong>Total Cost:</strong> ~1,600 tokens + 15 minutes of your time + frustration.</p
-                            ><p><strong>Scenario B: The "<code>AGENTS.md</code>" Approach</strong></p
+                            ><p><strong>Scenario B: The "Save Tokens" Approach (Worst Case)</strong></p
+                            ><ol
+                                ><li>You prompt the agent. (50 tokens)</li
+                                ><li>The agent uses a library that doesn't exist in your environment. (500 tokens)</li
+                                ><li>You paste the <code>ImportError</code> and your environment details. (1,000 tokens)</li
+                                ><li>The agent hallucinates a fix that breaks your architecture. (500 tokens)</li
+                                ><li>You argue with the agent about the architecture. (300 tokens)</li
+                                ><li>The agent finally produces working code. (500 tokens)</li></ol
+                            ><p><strong>Total Cost:</strong> ~2,850 tokens + 20 minutes of debugging. You have now spent <em>more</em> tokens than if you had simply provided the context upfront.</p
+                            ><p><strong>Scenario C: The "AGENTS.md" Approach</strong></p
                             ><ol
                                 ><li>You inject <code>AGENTS.md</code> into the system prompt. (2,000 tokens)</li
                                 ><li>You prompt: "Add a button to fetch historical data." (50 tokens)</li
@@ -237,7 +246,7 @@
                                 ><li>The agent generates the correct, async, logged solution on the first try. (500 tokens output)</li></ol
                             ><p><strong>Total Cost:</strong> ~2,550 tokens + 0 minutes of your time.</p
                             ><p
-                                >Yes, the <em>raw token count</em> is higher in Scenario B. But the <strong>Engineering Value</strong> is infinitely higher. You
+                                >Yes, the <em>raw token count</em> in Scenario C is higher than the best-case Scenario A, and in practice the totals are often higher again once your <code>AGENTS.md</code> grows beyond 2,000 tokens. But it is still usually lower than the messy, worst-case Scenario B that real-world sessions often drift into, which happens far more frequently than most teams expect, and the <strong>Engineering Value</strong> is infinitely higher. You
                                 traded cheap compute tokens for expensive human attention tokens.</p
                             ><p
                                 >Furthermore, context caching is becoming standard. Many providers now cache the prefix of your prompt (the system instructions
